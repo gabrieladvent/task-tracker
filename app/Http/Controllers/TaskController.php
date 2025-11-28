@@ -27,6 +27,7 @@ class TaskController extends Controller
             'status' => $validated['status'] ?? 'todo',
             'priority' => $validated['priority'] ?? 'low',
             'story_points' => $validated['story_points'] ?? null,
+            'notes' => $validated['notes'] ?? null,
             // 'project_id' => $validated['project_id'],
         ]);
 
@@ -43,6 +44,7 @@ class TaskController extends Controller
             'priority' => 'sometimes|in:low,medium,high',
             'story_points' => 'nullable|integer|min:0|max:100',
             'project_id' => 'nullable|exists:projects,id',
+            'notes' => 'nullable|string',
         ]);
 
         $task->update($validated);

@@ -76,8 +76,11 @@ export interface CalendarTask {
     title: string;
     status: string;
     priority: string;
+    description: string | null;
     story_points: number | null;
     project: string | null;
+    link_pull_request: string | null;
+    notes: string | null;
 }
 
 // export interface CalendarDay {

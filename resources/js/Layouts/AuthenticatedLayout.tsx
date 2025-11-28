@@ -25,7 +25,7 @@ export default function Authenticated({
                 transition={{ duration: 0.35 }}
                 className="border-b border-gray-100 bg-white"
             >
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 items-center justify-between">
 
                         {/* LEFT SIDE */}
@@ -39,7 +39,6 @@ export default function Authenticated({
                             </div>
 
                             <div className="hidden space-x-8 sm:ml-10 sm:flex">
-
                                 <motion.div whileHover={{ scale: 1.05 }}>
                                     <NavLink
                                         href={route('dashboard')}
@@ -63,7 +62,6 @@ export default function Authenticated({
                                         Projects
                                     </NavLink>
                                 </motion.div>
-
                             </div>
                         </div>
 
@@ -78,7 +76,6 @@ export default function Authenticated({
                                             className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-600"
                                         >
                                             {user.name}
-
                                             <svg
                                                 className="ml-2 h-4 w-4"
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -121,7 +118,6 @@ export default function Authenticated({
                                     fill="none"
                                     viewBox="0 0 24 24"
                                 >
-                                    {/* Hamburger */}
                                     <path
                                         className={!showingNavigationDropdown ? 'block' : 'hidden'}
                                         strokeLinecap="round"
@@ -129,7 +125,6 @@ export default function Authenticated({
                                         strokeWidth="2"
                                         d="M4 6h16M4 12h16M4 18h16"
                                     />
-                                    {/* X Button */}
                                     <path
                                         className={showingNavigationDropdown ? 'block' : 'hidden'}
                                         strokeLinecap="round"
@@ -198,13 +193,17 @@ export default function Authenticated({
 
             {header && (
                 <header className="bg-white shadow">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                    <div className="mx-auto max-w-full px-4 py-6 sm:px-6 lg:px-8">
                         {header}
                     </div>
                 </header>
             )}
 
-            <main>{children}</main>
+            <main>
+                <div className="w-full">
+                    {children}
+                </div>
+            </main>
         </div>
     );
 }

@@ -68,6 +68,8 @@ class PeriodServices
                     'id' => $task->id,
                     'title' => $task->title,
                     'description' => $task->description,
+                    'link_pull_request' => $task->link_pull_request,
+                    'notes' => $task->notes,
                     'status' => $task->status->value,
                     'priority' => $task->priority->value,
                     'story_points' => $task->story_points,
