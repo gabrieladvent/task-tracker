@@ -57,6 +57,7 @@ class PeriodServices
     private function getTasksGroupedByDate(Period $period): Collection
     {
         return $period->tasks()
+            ->with('project:id,name')
             ->byDate()
             ->get()
             ->groupBy(fn ($task) => $task->task_date->format('Y-m-d'))
@@ -73,7 +74,8 @@ class PeriodServices
                     'status' => $task->status->value,
                     'priority' => $task->priority->value,
                     'story_points' => $task->story_points,
-                    'project' => $task->project->name,
+                    'project_id' => $task->project_id,
+                    'project' => $task->project?->name,
                     'task_date' => $task->task_date->format('Y-m-d'),
                 ])->values(),
             ])
@@ -138,6 +140,10 @@ class PeriodServices
                 'priority' => $task->priority,
                 'story_points' => $task->story_points,
                 'project' => $task->project?->name,
+                'project_id' => $task->project_id,
+                'description' => $task->description,
+                'link_pull_request' => $task->link_pull_request,
+                'notes' => $task->notes,
             ])->toArray();
         });
 
