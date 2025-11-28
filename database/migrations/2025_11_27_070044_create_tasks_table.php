@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('period_id')->constrained('periods', 'id')->onDelete('cascade');
-            $table->foreignUuid('project_id')->constrained('projects', 'id')->onDelete('cascade');
+            $table->foreignUuid('project_id')->nullable()->constrained('projects')->onDelete('cascade');
             $table->date('task_date');
             $table->string('title');
             $table->text('description')->nullable();
