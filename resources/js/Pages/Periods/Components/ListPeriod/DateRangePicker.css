@@ -1,0 +1,331 @@
+/* Override react-date-range default styles */
+.rdrCalendarWrapper {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    width: 100% !important;
+    font-family: inherit;
+}
+
+.rdrDateRangeWrapper {
+    width: 100%;
+}
+
+.rdrMonths {
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    width: 100%;
+}
+
+.rdrMonth {
+    width: 50% !important;
+    padding: 2rem 2.5rem;
+    border-right: 1px solid #f3f4f6;
+    min-width: 350px;
+}
+
+.rdrMonth:last-child {
+    border-right: none;
+}
+
+.rdrMonthAndYearWrapper {
+    padding-bottom: 1.5rem;
+    align-items: center;
+    justify-content: space-between;
+    height: auto;
+}
+
+.rdrMonthAndYearPickers {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.rdrMonthPicker,
+.rdrYearPicker {
+    margin: 0;
+}
+
+.rdrMonthPicker select,
+.rdrYearPicker select {
+    padding: 0.75rem 3rem 0.75rem 1.25rem;
+    border-radius: 0.75rem;
+    border: 1px solid #d1d5db;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #111827;
+    background-color: #ffffff;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23374151'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.25rem;
+    min-width: 140px;
+}
+
+.rdrMonthPicker select:focus,
+.rdrYearPicker select:focus {
+    outline: none;
+    border-color: #1f2937;
+    box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.1);
+}
+
+.rdrNextPrevButton {
+    background: #f9fafb;
+    border-radius: 0.75rem;
+    margin: 2rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.rdrNextPrevButton:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    transform: scale(1.05);
+}
+
+.rdrNextPrevButton:active {
+    transform: scale(0.95);
+}
+
+.rdrNextPrevButton i {
+    display: none;
+}
+
+.rdrPprevButton::after {
+    content: '‹';
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #374151;
+    line-height: 1;
+}
+
+.rdrNextButton::after {
+    content: '›';
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #374151;
+    line-height: 1;
+}
+
+.rdrNextPrevButton:hover::after {
+    color: #1f2937;
+}
+
+.rdrNextPrevButton:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.rdrPprevButton i {
+    border-right-color: #374151;
+    border-width: 2px 2px 0 0;
+    transform: rotate(-135deg);
+    margin-left: 2px;
+}
+
+.rdrNextButton i {
+    border-left-color: #374151;
+    border-width: 2px 0 0 2px;
+    transform: rotate(45deg);
+    margin-right: 2px;
+}
+
+.rdrWeekDays {
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.rdrWeekDay {
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    line-height: 3rem;
+    letter-spacing: 0.5px;
+}
+
+.rdrDays {
+    padding: 0;
+}
+
+.rdrDay {
+    height: 3.5rem;
+    line-height: 3.5rem;
+}
+
+.rdrDayNumber {
+    font-weight: 500;
+    font-size: 1rem;
+    color: #111827;
+    top: 50%;
+    transform: translateY(-50%);
+    bottom: auto;
+    z-index: 2;
+    position: relative;
+}
+
+.rdrDayToday .rdrDayNumber span {
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.rdrDayToday .rdrDayNumber span:after {
+    background: #1f2937;
+    bottom: 4px;
+    height: 2px;
+    width: 60%;
+    left: 20%;
+}
+
+.rdrDayPassive .rdrDayNumber span {
+    color: #d1d5db;
+}
+
+.rdrDayDisabled {
+    background-color: transparent;
+}
+
+.rdrDayDisabled .rdrDayNumber span {
+    color: #e5e7eb;
+}
+
+/* Selected range styling - IMPROVED */
+.rdrInRange {
+    background: rgba(31, 41, 55, 0.15) !important;
+    border: none;
+}
+
+.rdrStartEdge,
+.rdrEndEdge {
+    background: #1f2937 !important;
+    color: #ffffff !important;
+    border-radius: 0.75rem !important;
+    z-index: 1;
+}
+
+.rdrStartEdge .rdrDayNumber span,
+.rdrEndEdge .rdrDayNumber span {
+    color: #ffffff !important;
+    font-weight: 700;
+}
+
+.rdrDayStartPreview,
+.rdrDayInPreview,
+.rdrDayEndPreview {
+    border: none;
+    background: rgba(31, 41, 55, 0.1) !important;
+}
+
+/* Make the in-range background span full width with proper rounding */
+.rdrDay .rdrInRange {
+    border-radius: 0 !important;
+}
+
+/* Round corners for start/end of range */
+.rdrDayStartOfMonth.rdrStartEdge,
+.rdrDayStartOfWeek.rdrStartEdge {
+    border-top-left-radius: 0.75rem !important;
+    border-bottom-left-radius: 0.75rem !important;
+}
+
+.rdrDayEndOfMonth.rdrEndEdge,
+.rdrDayEndOfWeek.rdrEndEdge {
+    border-top-right-radius: 0.75rem !important;
+    border-bottom-right-radius: 0.75rem !important;
+}
+
+/* Single day selection */
+.rdrDayStartEdge.rdrDayEndEdge {
+    border-radius: 0.75rem !important;
+}
+
+
+/* Make sure numbers remain visible on selected dates */
+.rdrDay:not(.rdrDayPassive) .rdrInRange~.rdrDayNumber span {
+    color: #111827;
+    font-weight: 500;
+}
+
+.rdrDay:not(.rdrDayPassive) .rdrStartEdge~.rdrDayNumber span,
+.rdrDay:not(.rdrDayPassive) .rdrEndEdge~.rdrDayNumber span {
+    color: #ffffff !important;
+    font-weight: 700;
+}
+
+/* Remove default date display */
+.rdrDateDisplayWrapper,
+.rdrDateDisplay {
+    display: none;
+}
+
+/* Improve the selection visual feedback */
+.rdrDay .rdrStartEdge,
+.rdrDay .rdrEndEdge {
+    z-index: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .rdrMonth {
+        padding: 1.5rem 2rem;
+        min-width: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .rdrMonths {
+        flex-direction: column;
+    }
+
+    .rdrMonth {
+        width: 100% !important;
+        border-right: none;
+        border-bottom: 1px solid #f3f4f6;
+        padding: 1.5rem;
+        min-width: auto;
+    }
+
+    .rdrMonth:last-child {
+        border-bottom: none;
+    }
+
+    .rdrCalendarWrapper {
+        max-width: 100%;
+    }
+
+    .rdrDay {
+        height: 3rem;
+        line-height: 3rem;
+    }
+
+    .rdrDayNumber {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .rdrMonth {
+        padding: 1rem;
+    }
+
+    .rdrDay {
+        height: 2.75rem;
+        line-height: 2.75rem;
+    }
+
+    .rdrDayNumber {
+        font-size: 0.85rem;
+    }
+}
