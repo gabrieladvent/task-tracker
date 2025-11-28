@@ -9,8 +9,8 @@ export default function Dashboard() {
         <AuthenticatedLayout>
             <Head title="Dashboard" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="py-10 w-full">
+                <div className="mx-auto max-w-full sm:px-6 lg:px-8">
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 
                         <motion.div

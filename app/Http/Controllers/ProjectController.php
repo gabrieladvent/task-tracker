@@ -3,18 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
-use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
-    public function store(Request $request)
+    public function index()
     {
-        Project::create([
-            'name' => $request->get('name'),
-            'description' => $request->get('description'),
-            'color' => $request->get('color'),
-        ]);
-
-        return back();
+        $projects = Project::all();
+        return response()->json($projects);
     }
 }

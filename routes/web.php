@@ -1,11 +1,12 @@
 <?php
 
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Application;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\PeriodController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\TaskController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use App\Http\Controllers\ProjectController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -30,6 +31,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('periods/{period}')->group(function () {
         Route::post('/tasks', [TaskController::class, 'store'])->name('periods.tasks.store');
     });
+
+    Route::get('/projects', [ProjectController::class, 'index']);
 
     Route::prefix('tasks')->group(function () {
         Route::put('/{task}', [TaskController::class, 'update'])->name('tasks.update');

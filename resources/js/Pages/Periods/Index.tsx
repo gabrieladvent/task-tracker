@@ -18,8 +18,8 @@ export default function Index({ periods }: Props) {
         <AuthenticatedLayout>
             <Head title="Periods" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="py-10 w-full">
+                <div className="mx-auto max-w-full sm:px-6 lg:px-8">
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
