@@ -43,6 +43,15 @@ export const getPriorityColor = (priority: string): string => {
     return colors[priority] || "text-gray-600";
 };
 
+export const getPriorityBadgeColor = (priority: string): string => {
+    const colors: Record<string, string> = {
+        low: "bg-gray-100 text-gray-700",
+        medium: "bg-amber-100 text-amber-700",
+        high: "bg-red-100 text-red-700",
+    };
+    return colors[priority] || "bg-gray-100 text-gray-700";
+};
+
 export const truncateText = (text: string, maxLength: number = 25): string => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + "...";

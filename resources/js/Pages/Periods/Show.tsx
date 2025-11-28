@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { Props, CalendarTask, NewTaskData } from '@/Pages/Periods/types/period';
@@ -36,7 +36,7 @@ export default function ShowPeriod({ period, tasksByDate, calendarData }: Props)
     };
 
     const openDetailModal = (task: CalendarTask) => {
-        setSelectedTask(task);
+        setSelectedTask({ ...task });
         setShowDetailModal(true);
     };
 

@@ -1,3 +1,45 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Editor.js Custom Styling */
+
+.ce-block__content,
+.ce-toolbar__content {
+    max-width: none !important;
+    margin: 0 3rem;
+}
+
+.codex-editor {
+    padding: 0;
+}
+
+.codex-editor__redactor {
+    padding-bottom: 2.5rem !important;
+    margin: 0;
+}
+
+.ce-paragraph {
+    padding: 0.5rem 0;
+    margin: 0;
+}
+
+.ce-toolbar {
+    padding: 0.5rem 1rem;
+}
+
+.ce-inline-toolbar {
+    transform: translateX(-50%);
+}
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none;
+}
+
+select::-ms-expand {
+    display: none;
+    /* Untuk IE/Edge lama */
+}

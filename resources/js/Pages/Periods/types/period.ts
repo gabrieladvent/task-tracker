@@ -22,6 +22,7 @@ export interface Task {
     priority: "low" | "medium" | "high";
     story_points: number | null;
     project: string | null;
+    project_id: string | null;
     task_date: string;
     link_pull_request: string | null;
     notes: string | null;
@@ -64,13 +65,6 @@ export interface PeriodFormData {
     end_date: string | undefined;
 }
 
-// export interface TasksByDate {
-//     date: string;
-//     day_name: string;
-//     formatted_date: string;
-//     tasks: Task[];
-// }
-
 export interface CalendarTask {
     id: string;
     title: string;
@@ -79,26 +73,13 @@ export interface CalendarTask {
     description: string | null;
     story_points: number | null;
     project: string | null;
+    project_id: string | null;
     link_pull_request: string | null;
     notes: string | null;
 }
 
-// export interface CalendarDay {
-//     date: string;
-//     day: number;
-//     is_in_period: boolean;
-//     is_today: boolean;
-//     tasks_count: number;
-//     completed_count: number;
-//     tasks: CalendarTask[];
-// }
-
 export interface CalendarWeek extends Array<CalendarDay> {}
 
-// export interface CalendarData {
-//     weeks: CalendarWeek[];
-//     month: string;
-// }
 
 export interface Props {
     period: Period;
@@ -112,4 +93,5 @@ export interface NewTaskData {
     status: string;
     priority: string;
     story_points: string;
+    project_id?: string;
 }

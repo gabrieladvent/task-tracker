@@ -28,7 +28,7 @@ class TaskController extends Controller
             'priority' => $validated['priority'] ?? 'low',
             'story_points' => $validated['story_points'] ?? null,
             'notes' => $validated['notes'] ?? null,
-            // 'project_id' => $validated['project_id'],
+            'project_id' => $validated['project_id'],
         ]);
 
         return back();

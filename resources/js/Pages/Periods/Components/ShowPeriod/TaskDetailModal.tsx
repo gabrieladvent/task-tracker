@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { router } from '@inertiajs/react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { CalendarTask } from '@/Pages/Periods/types/period';
-import { getStatusColor, getStatusBadgeColor, getStatusLabel, getPriorityColor } from '@/Pages/Periods/utils';
+import { getStatusColor, getStatusBadgeColor, getPriorityColor, getPriorityBadgeColor } from '@/Pages/Periods/utils';
 import { Project } from '@/Pages/Periods/types/period';
 
 // Import Editor.js
@@ -17,6 +17,7 @@ import Delimiter from '@editorjs/delimiter';
 import Warning from '@editorjs/warning';
 import Marker from '@editorjs/marker';
 import InlineCode from '@editorjs/inline-code';
+import { Trash } from 'lucide-react';
 
 interface TaskDetailModalProps {
     isOpen: boolean;
@@ -51,83 +52,56 @@ export default function TaskDetailModal({ isOpen, onClose, task, periodId }: Tas
     const editorContainerRef = useRef<HTMLDivElement>(null);
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Debug log ketika task berubah
-    useEffect(() => {
-        if (task) {
-            console.log('=== Task Data Debug ===');
-            console.log('Task ID:', task.id);
-            console.log('Task Title:', task.title);
-            console.log('Task Description:', task.description);
-            console.log('Task Notes:', task.notes);
-            console.log('Task Status:', task.status);
-            console.log('Full Task Object:', task);
-        }
-    }, [task]);
-
-    // Fetch projects ketika modal dibuka
     useEffect(() => {
         if (isOpen && task) {
             fetchProjects();
         }
     }, [isOpen, task]);
 
-    // Reset form data ketika task berubah
     useEffect(() => {
         if (task && isOpen) {
-            console.log('Task data received:', task);
-
             const newFormData = {
                 title: task.title || '',
                 description: task.description || '',
                 status: task.status || 'todo',
                 priority: task.priority || 'low',
                 story_points: task.story_points?.toString() || '',
-                project_id: task.project || '',
+                project_id: task.project_id || '',
                 notes: task.notes || '',
                 link_pull_request: task.link_pull_request || ''
             };
 
-            console.log('Setting form data:', newFormData);
             setFormData(newFormData);
 
-            // Initialize editor dengan data notes - delay lebih lama untuk memastikan DOM ready
             setTimeout(() => {
                 initializeEditor(task.notes || '');
             }, 150);
         }
-    }, [task?.id, isOpen]);
+    }, [task?.id, isOpen, task?.project_id]);
 
-    // Initialize Editor.js
     const initializeEditor = useCallback((notes: string) => {
-        console.log('Initializing editor with notes:', notes);
 
         if (editorRef.current) {
             editorRef.current.destroy();
             editorRef.current = null;
         }
 
-        // Clear container dulu
         if (editorContainerRef.current) {
             editorContainerRef.current.innerHTML = '<div id="editorjs"></div>';
         }
 
-        // Wait for DOM update
         setTimeout(() => {
             let initialData: EditorData = {
                 blocks: []
             };
 
-            // Parse existing notes jika ada
             if (notes && notes.trim() !== '') {
                 try {
                     const parsed = JSON.parse(notes);
                     if (parsed.blocks && Array.isArray(parsed.blocks)) {
                         initialData = parsed;
-                        console.log('Parsed notes successfully:', initialData);
                     }
                 } catch (error) {
-                    console.log('Notes is plain text, converting to Editor.js format');
-                    // Jika notes adalah plain text, convert ke format Editor.js
                     initialData = {
                         blocks: [
                             {
@@ -185,11 +159,7 @@ export default function TaskDetailModal({ isOpen, onClose, task, periodId }: Tas
                     },
                     data: initialData,
                     placeholder: 'Start writing your notes...',
-                    onReady: () => {
-                        console.log('Editor.js is ready with data:', initialData);
-                    },
                     onChange: async (api, event) => {
-                        console.log('Editor content changed');
                         debouncedSaveNotes();
                     },
                     minHeight: 200,
@@ -203,7 +173,6 @@ export default function TaskDetailModal({ isOpen, onClose, task, periodId }: Tas
     // Debounced save untuk notes
     const saveNotes = useCallback(async () => {
         if (!editorRef.current || !task?.id) {
-            console.log('Cannot save: editor not ready or no task ID');
             return;
         }
 
@@ -211,11 +180,9 @@ export default function TaskDetailModal({ isOpen, onClose, task, periodId }: Tas
             setIsSavingNotes(true);
             setSaveStatus('saving');
 
-            console.log('Saving notes...');
             const savedData = await editorRef.current.save();
             const notesJson = JSON.stringify(savedData);
 
-            console.log('Notes to save:', notesJson);
             await handleSaveField('notes', notesJson);
 
             setSaveStatus('saved');
@@ -236,7 +203,7 @@ export default function TaskDetailModal({ isOpen, onClose, task, periodId }: Tas
         }
         debounceRef.current = setTimeout(() => {
             saveNotes();
-        }, 1500); // Auto-save setelah 1.5 detik idle
+        }, 1500);
     }, [saveNotes]);
 
     // Cleanup
@@ -255,7 +222,7 @@ export default function TaskDetailModal({ isOpen, onClose, task, periodId }: Tas
     const fetchProjects = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch('/api/projects');
+            const response = await fetch('/projects');
             if (response.ok) {
                 const data = await response.json();
                 setProjects(data);
@@ -273,22 +240,18 @@ export default function TaskDetailModal({ isOpen, onClose, task, periodId }: Tas
             return;
         }
 
-        console.log('Updating task:', updates);
-
         try {
             await router.put(`/tasks/${task.id}`, updates, {
                 preserveScroll: true,
             });
 
             setFormData(prev => ({ ...prev, ...updates }));
-            console.log('Task updated successfully');
         } catch (error) {
             console.error('Update failed:', error);
         }
     };
 
     const handleSaveField = async (field: string, value: string) => {
-        console.log(`Saving field ${field}:`, value);
 
         const updates: any = { [field]: value };
 
@@ -356,7 +319,6 @@ export default function TaskDetailModal({ isOpen, onClose, task, periodId }: Tas
 
         useEffect(() => {
             setLocalValue(value);
-            console.log(`EditableInput updated with value:`, value);
         }, [value]);
 
         useEffect(() => {
@@ -376,7 +338,6 @@ export default function TaskDetailModal({ isOpen, onClose, task, periodId }: Tas
 
         const handleSave = () => {
             if (localValue.trim() !== value.trim()) {
-                console.log(`Saving ${type} field:`, localValue);
                 onChange(localValue);
             }
             setIsEditing(false);
@@ -533,20 +494,39 @@ export default function TaskDetailModal({ isOpen, onClose, task, periodId }: Tas
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.1 }}
                                     >
-                                        <div className="flex items-center gap-3 mb-3">
-                                            <span className={`h-3 w-3 rounded-full ${getStatusColor(formData.status)}`} />
-                                            <select
-                                                value={formData.status}
-                                                onChange={(e) => handleSaveField('status', e.target.value)}
-                                                className={`text-sm font-medium px-3 py-2 rounded-lg border ${getStatusBadgeColor(formData.status)
-                                                    } border-gray-300 focus:border-blue-500 focus:ring-blue-500 cursor-pointer`}
-                                            >
-                                                {statusOptions.map(option => (
-                                                    <option key={option.value} value={option.value}>
-                                                        {option.label}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                        <div className="flex items-center justify-self-start">
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <span className={`h-3 w-3 rounded-full ${getStatusColor(formData.status)}`} />
+                                                <select
+                                                    value={formData.status}
+                                                    onChange={(e) => handleSaveField('status', e.target.value)}
+                                                    className={`text-sm font-medium px-2 py-1 rounded-lg border ${getStatusBadgeColor(formData.status)
+                                                        } border-none focus:border-blue-500 focus:ring-blue-500 cursor-pointer`}
+                                                >
+                                                    {statusOptions.map(option => (
+                                                        <option key={option.value} value={option.value}>
+                                                            {option.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            <div className='flex items-center gap-3 mb-3'>
+                                                <span className={`h-3 w-3 rounded-full ${getPriorityColor(formData.priority)}`} />
+
+                                                <select
+                                                    value={formData.priority}
+                                                    onChange={(e) => handleSaveField('priority', e.target.value)}
+                                                    className={`text-sm font-medium px-2 py-1 rounded-lg border ${getPriorityBadgeColor(formData.priority)
+                                                        } border-none focus:border-blue-500 focus:ring-blue-500 cursor-pointer`}
+                                                >
+                                                    {priorityOptions.map(option => (
+                                                        <option key={option.value} value={option.value}>
+                                                            {option.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
                                         </div>
 
                                         <EditableInput
@@ -557,30 +537,38 @@ export default function TaskDetailModal({ isOpen, onClose, task, periodId }: Tas
                                         />
                                     </motion.div>
 
-                                    {/* Priority & Story Points */}
+                                    {/* Project & Story Points */}
                                     <motion.div
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.15 }}
                                         className="grid grid-cols-2 gap-6"
                                     >
-                                        <div>
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.2 }}
+                                        >
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Priority
+                                                Project
                                             </label>
                                             <select
-                                                value={formData.priority}
-                                                onChange={(e) => handleSaveField('priority', e.target.value)}
-                                                className={`w-full font-medium border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer ${getPriorityColor(formData.priority)
-                                                    }`}
+                                                value={formData.project_id}
+                                                onChange={(e) => handleSaveField('project_id', e.target.value)}
+                                                className="w-full text-gray-900 border border-gray-300 rounded-lg px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+                                                disabled={isLoading}
                                             >
-                                                {priorityOptions.map(option => (
-                                                    <option key={option.value} value={option.value}>
-                                                        {option.label}
+                                                <option value="">Select Project</option>
+                                                {projects.map(project => (
+                                                    <option key={project.id} value={project.id}>
+                                                        {project.name}
                                                     </option>
                                                 ))}
                                             </select>
-                                        </div>
+                                            {isLoading && (
+                                                <p className="text-sm text-gray-500 mt-1">Loading projects...</p>
+                                            )}
+                                        </motion.div>
 
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -591,36 +579,9 @@ export default function TaskDetailModal({ isOpen, onClose, task, periodId }: Tas
                                                 onChange={(value) => handleSaveField('story_points', value)}
                                                 placeholder="0"
                                                 type="number"
-                                                className="w-full font-medium border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                className="w-full font-medium border border-gray-400 rounded-lg px-1 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                             />
                                         </div>
-                                    </motion.div>
-
-                                    {/* Project */}
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.2 }}
-                                    >
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Project
-                                        </label>
-                                        <select
-                                            value={formData.project_id}
-                                            onChange={(e) => handleSaveField('project_id', e.target.value)}
-                                            className="w-full text-gray-900 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
-                                            disabled={isLoading}
-                                        >
-                                            <option value="">Select Project</option>
-                                            {projects.map(project => (
-                                                <option key={project.id} value={project.id}>
-                                                    {project.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {isLoading && (
-                                            <p className="text-sm text-gray-500 mt-1">Loading projects...</p>
-                                        )}
                                     </motion.div>
 
                                     {/* Description */}
@@ -630,16 +591,18 @@ export default function TaskDetailModal({ isOpen, onClose, task, periodId }: Tas
                                         transition={{ delay: 0.25 }}
                                     >
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Description
+                                            Description Task
                                         </label>
                                         <EditableInput
                                             value={formData.description}
                                             onChange={(value) => handleSaveField('description', value)}
                                             placeholder="Add task description..."
                                             multiline
-                                            className="w-full"
+                                            className="border border-gray-300 rounded-lg overflow-hidden min-h-[150px] bg-white"
                                         />
                                     </motion.div>
+
+                                    <hr className="my-4" />
 
                                     {/* Notes dengan Editor.js */}
                                     <motion.div
@@ -666,9 +629,11 @@ export default function TaskDetailModal({ isOpen, onClose, task, periodId }: Tas
                                         </div>
                                         <div
                                             ref={editorContainerRef}
-                                            className="border border-gray-300 rounded-lg overflow-hidden min-h-[300px] bg-white [&_.ce-block__content]:max-w-none [&_.ce-toolbar__content]:max-w-none [&_.codex-editor__redactor]:pb-10 [&_.ce-paragraph]:px-4"
+                                            className="border border-gray-300 rounded-lg overflow-hidden min-h-[300px] bg-white"
                                         >
-                                            <div id="editorjs"></div>
+                                            <div className="editor-container h-full">
+                                                <div id="editorjs" className="h-full"></div>
+                                            </div>
                                         </div>
                                     </motion.div>
 
@@ -722,7 +687,7 @@ export default function TaskDetailModal({ isOpen, onClose, task, periodId }: Tas
                                                 onClick={handleDeleteTask}
                                                 className="rounded-lg bg-red-600 px-6 py-3 text-base font-medium text-white hover:bg-red-700 transition-colors"
                                             >
-                                                Delete Task
+                                                <Trash size={18}/>
                                             </motion.button>
                                         </div>
                                     </motion.div>

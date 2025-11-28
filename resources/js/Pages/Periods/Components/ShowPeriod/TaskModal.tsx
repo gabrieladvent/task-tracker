@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { router } from '@inertiajs/react';
-import { NewTaskData } from '@/Pages/Periods/types/period';
+import { NewTaskData, Project } from '@/Pages/Periods/types/period';
+import { useEffect, useState } from 'react';
 
 interface TaskModalProps {
     isOpen: boolean;
@@ -19,6 +20,26 @@ export default function TaskModal({
     onNewTaskChange,
     periodId
 }: TaskModalProps) {
+
+    const [projects, setProjects] = useState<Project[]>([]);
+
+    useEffect(() => {
+        if (isOpen) {
+            fetchProjects();
+        }
+    }, [isOpen]);
+
+    const fetchProjects = async () => {
+        try {
+            const response = await fetch('/projects');
+            if (response.ok) {
+                const data = await response.json();
+                setProjects(data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch projects:', error);
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -153,6 +174,26 @@ export default function TaskModal({
                                             min="0"
                                             max="100"
                                         />
+                                    </motion.div>
+
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.18 }}
+                                    >
+                                        <label className="block text-sm font-medium text-gray-700">Project</label>
+                                        <select
+                                            value={newTask.project_id || ''}
+                                            onChange={(e) => onNewTaskChange({ project_id: e.target.value })}
+                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors"
+                                        >
+                                            <option value="">Select Project</option>
+                                            {projects.map(project => (
+                                                <option key={project.id} value={project.id}>
+                                                    {project.name}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </motion.div>
 
                                     <motion.div

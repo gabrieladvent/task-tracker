@@ -41,6 +41,7 @@
         "@editorjs/warning": "^1.4.1",
         "date-fns": "^4.1.0",
         "framer-motion": "^12.23.24",
+        "lucide-react": "^0.555.0",
         "react-date-range": "^2.0.1"
     }
 }
