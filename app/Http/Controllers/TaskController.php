@@ -18,6 +18,7 @@ class TaskController extends Controller
             'priority' => 'nullable|in:low,medium,high',
             'story_points' => 'nullable|integer|min:0|max:100',
             'project_id' => 'nullable|exists:projects,id',
+            'notes' => 'nullable|string',
         ]);
 
         $task = $period->tasks()->create([
@@ -28,10 +29,10 @@ class TaskController extends Controller
             'priority' => $validated['priority'] ?? 'low',
             'story_points' => $validated['story_points'] ?? null,
             'notes' => $validated['notes'] ?? null,
-            'project_id' => $validated['project_id'],
+            'project_id' => $validated['project_id'] ?? null,
         ]);
 
-        return back();
+        return back()->with('newTaskId', $task->id);
     }
 
     public function update(Request $request, Task $task)
@@ -45,6 +46,7 @@ class TaskController extends Controller
             'story_points' => 'nullable|integer|min:0|max:100',
             'project_id' => 'nullable|exists:projects,id',
             'notes' => 'nullable|string',
+            'link_pull_request' => 'nullable|string',
         ]);
 
         $task->update($validated);
