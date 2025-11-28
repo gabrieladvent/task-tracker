@@ -76,6 +76,7 @@ export interface CalendarTask {
     project_id: string | null;
     link_pull_request: string | null;
     notes: string | null;
+    task_date: string;
 }
 
 export interface CalendarWeek extends Array<CalendarDay> {}

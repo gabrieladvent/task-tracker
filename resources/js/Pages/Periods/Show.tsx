@@ -1,54 +1,49 @@
 import { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { Props, CalendarTask, NewTaskData } from '@/Pages/Periods/types/period';
+import { Props, CalendarTask } from '@/Pages/Periods/types/period';
 import CalendarView from '@/Pages/Periods/Components/ShowPeriod/CalendarView';
 import ListView from '@/Pages/Periods/Components/ShowPeriod/ListView';
 import ViewToggle from '@/Pages/Periods/Components/ShowPeriod/ViewToggle';
-import TaskModal from '@/Pages/Periods/Components/ShowPeriod/TaskModal';
 import TaskDetailModal from '@/Pages/Periods/Components/ShowPeriod/TaskDetailModal';
 import { motion } from 'framer-motion';
 
 export default function ShowPeriod({ period, tasksByDate, calendarData }: Props) {
     const [view, setView] = useState<'calendar' | 'list'>('calendar');
-    const [showTaskModal, setShowTaskModal] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [selectedTask, setSelectedTask] = useState<CalendarTask | null>(null);
-    const [selectedDate, setSelectedDate] = useState<string>('');
-    const [newTask, setNewTask] = useState<NewTaskData>({
-        title: '',
-        description: '',
-        status: 'todo',
-        priority: 'low',
-        story_points: '',
-    });
+    const [isNewTask, setIsNewTask] = useState(false);
 
     const openNewTaskModal = (date: string) => {
-        setSelectedDate(date);
-        setNewTask({
+        const emptyTask: CalendarTask = {
+            id: 'new',
             title: '',
             description: '',
             status: 'todo',
             priority: 'low',
-            story_points: '',
-        });
-        setShowTaskModal(true);
+            story_points: null,
+            project_id: '',
+            notes: '',
+            link_pull_request: '',
+            task_date: date,
+            project: null
+        };
+
+        setSelectedTask(emptyTask);
+        setIsNewTask(true);
+        setShowDetailModal(true);
     };
 
     const openDetailModal = (task: CalendarTask) => {
         setSelectedTask({ ...task });
+        setIsNewTask(false);
         setShowDetailModal(true);
     };
 
     const closeModals = () => {
-        setShowTaskModal(false);
         setShowDetailModal(false);
         setSelectedTask(null);
-        setSelectedDate('');
-    };
-
-    const handleNewTaskChange = (updates: Partial<NewTaskData>) => {
-        setNewTask(prev => ({ ...prev, ...updates }));
+        setIsNewTask(false);
     };
 
     return (
@@ -93,21 +88,13 @@ export default function ShowPeriod({ period, tasksByDate, calendarData }: Props)
                 </div>
             </div>
 
-            {/* Modals */}
-            <TaskModal
-                isOpen={showTaskModal}
-                onClose={closeModals}
-                selectedDate={selectedDate}
-                newTask={newTask}
-                onNewTaskChange={handleNewTaskChange}
-                periodId={period.id}
-            />
-
+            {/* Task Detail Modal - dengan mode create/edit */}
             <TaskDetailModal
                 isOpen={showDetailModal}
                 onClose={closeModals}
                 task={selectedTask}
                 periodId={period.id}
+                isNewTask={isNewTask}
             />
         </AuthenticatedLayout>
     );
