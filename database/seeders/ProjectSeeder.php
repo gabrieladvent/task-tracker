@@ -7,11 +7,28 @@ use Illuminate\Database\Seeder;
 
 class ProjectSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Project::factory(3)->create();
+        $projects = [
+            [
+                'name' => 'HRIS',
+                'color' => '#FF5733',
+                'description' => 'Human Resource Information System',
+            ],
+            [
+                'name' => 'Kraken Onboarding',
+                'color' => '#3498DB',
+                'description' => 'This project is for the benefit of UAT new aggregators',
+            ],
+            [
+                'name' => 'Kraken',
+                'color' => '#2ECC71',
+                'description' => 'This project is for the integration of new aggregators and the core of all finance and engines.',
+            ],
+        ];
+
+        foreach ($projects as $project) {
+            Project::create($project);
+        }
     }
 }

@@ -5,6 +5,7 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Toaster } from 'react-hot-toast';
 
 export default function Authenticated({
     header,
@@ -17,6 +18,7 @@ export default function Authenticated({
 
     return (
         <div className="min-h-screen bg-gray-100">
+            <Toaster />
 
             {/* NAVBAR */}
             <motion.nav
