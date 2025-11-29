@@ -95,9 +95,9 @@ class PeriodServices
 
         $end = $period->end_date->copy();
 
-        $calendarStart = $start->copy()->startOfWeek();
+        $calendarStart = $start->copy()->startOfWeek(Carbon::SUNDAY);
 
-        $calendarEnd = $end->copy()->endOfWeek();
+        $calendarEnd = $end->copy()->endOfWeek(Carbon::SATURDAY);
 
         $tasksData = $this->getTasksDataForCalendar($period);
 
