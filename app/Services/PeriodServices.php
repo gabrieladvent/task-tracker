@@ -119,6 +119,7 @@ class PeriodServices
     {
         $tasks = $period->tasks()
             ->with('project:id,name')
+            ->select(['id', 'title', 'status', 'priority', 'story_points', 'project_id', 'description', 'link_pull_request', 'notes', 'task_date', 'created_at'])
             ->orderBy('task_date')
             ->orderBy('created_at')
             ->get();
@@ -126,9 +127,16 @@ class PeriodServices
         $tasksByDate = $tasks->groupBy(fn ($task) => $task->task_date->format('Y-m-d'));
 
         $taskCounts = $tasksByDate->map(function ($dateTasks) {
+            $completed = 0;
+            foreach ($dateTasks as $task) {
+                if ($task->status->value === 'done') {
+                    $completed++;
+                }
+            }
+
             return [
                 'count' => $dateTasks->count(),
-                'completed' => $dateTasks->where('status', 'done')->count(),
+                'completed' => $completed,
             ];
         });
 
@@ -136,8 +144,8 @@ class PeriodServices
             return $dateTasks->map(fn ($task) => [
                 'id' => $task->id,
                 'title' => $task->title,
-                'status' => $task->status,
-                'priority' => $task->priority,
+                'status' => $task->status->value,
+                'priority' => $task->priority->value,
                 'story_points' => $task->story_points,
                 'project' => $task->project?->name,
                 'project_id' => $task->project_id,

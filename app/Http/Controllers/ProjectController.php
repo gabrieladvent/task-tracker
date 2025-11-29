@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
 use App\Models\Project;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
@@ -40,6 +40,8 @@ class ProjectController extends Controller
 
         Project::create($validated);
 
+        Cache::forget('all_projects');
+
         return redirect()->route('projects.index');
     }
 
@@ -58,6 +60,8 @@ class ProjectController extends Controller
 
         $project->update($validated);
 
+        Cache::forget('all_projects');
+
         return redirect()->route('projects.index');
     }
 
@@ -65,12 +69,17 @@ class ProjectController extends Controller
     {
         $project->delete();
 
+        Cache::forget('all_projects');
+
         return redirect()->route('projects.index');
     }
 
-    public function getAllProject(): JsonResponse
+    public function getAllProject()
     {
-        $projects = Project::all();
+        $projects = Cache::remember('all_projects', 3600, function () {
+            return Project::select('id', 'name')->orderBy('name')->get();
+        });
+
         return response()->json($projects);
     }
 }

@@ -74,6 +74,7 @@ export default function ShowPeriod({ period, tasksByDate, calendarData }: Props)
                             calendarData={calendarData}
                             onAddTask={openNewTaskModal}
                             onTaskClick={openDetailModal}
+                            periodId={period.id}
                         />
                     )}
 

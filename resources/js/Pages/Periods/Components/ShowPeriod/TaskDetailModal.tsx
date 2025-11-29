@@ -7,6 +7,7 @@ import { Project } from '@/Pages/Periods/types/period';
 import EditorJS from '@editorjs/editorjs';
 import { Trash, Save } from 'lucide-react';
 import { DEBOUNCE_DELAY, EDITOR_INIT_DELAY, EDITOR_TOOLS_CONFIG, PRIORITY_OPTIONS, STATUS_OPTIONS } from '../../Constants/StatusOption';
+import ConfirmDeleteModal from '@/Components/ConfirmDeleteModal';
 
 
 interface TaskDetailModalProps {
@@ -74,18 +75,22 @@ const MotionSection = memo(({ delay, children, className = "" }: {
     </motion.div>
 ));
 
+MotionSection.displayName = 'MotionSection';
+
 const StatusSelector = memo(({
     value,
     onChange,
     options,
     getColor,
-    getBadgeColor
+    getBadgeColor,
+    label
 }: {
     value: string;
     onChange: (value: string) => void;
     options: { value: string; label: string }[];
     getColor: (value: string) => string;
     getBadgeColor: (value: string) => string;
+    label?: string;
 }) => (
     <div className="flex items-center gap-3 mb-3">
         <span className={`h-3 w-3 rounded-full ${getColor(value)}`} />
@@ -93,6 +98,7 @@ const StatusSelector = memo(({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             className={`text-sm font-medium px-2 py-1 rounded-lg border ${getBadgeColor(value)} border-none focus:border-blue-500 focus:ring-blue-500 cursor-pointer`}
+            aria-label={label}
         >
             {options.map(option => (
                 <option key={option.value} value={option.value}>
@@ -102,6 +108,8 @@ const StatusSelector = memo(({
         </select>
     </div>
 ));
+
+StatusSelector.displayName = 'StatusSelector';
 
 const EditableInput = memo(({
     value,
@@ -224,6 +232,7 @@ export default function TaskDetailModal({
     const [isLoading, setIsLoading] = useState(false);
     const [isSavingNotes, setIsSavingNotes] = useState(false);
     const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -395,15 +404,17 @@ export default function TaskDetailModal({
 
     const handleDeleteTask = useCallback(() => {
         if (!task?.id || isNewTask) return;
+        setShowDeleteConfirm(true);
+    }, [task?.id, isNewTask]);
 
-        if (confirm('Are you sure you want to delete this task?')) {
-            router.delete(`/tasks/${task.id}`, {
-                onSuccess: () => {
-                    onClose();
-                }
-            });
-        }
-    }, [task?.id, isNewTask, onClose]);
+    const confirmDelete = useCallback(() => {
+        if (!task?.id) return;
+        router.delete(`/tasks/${task.id}`, {
+            onSuccess: () => {
+                onClose();
+            }
+        });
+    }, [task?.id, onClose]);
 
     const toggleTaskStatus = useCallback(() => {
         const newStatus = formData.status === 'done' ? 'todo' : 'done';
@@ -448,234 +459,247 @@ export default function TaskDetailModal({
     if (!task) return null;
 
     return (
-        <AnimatePresence>
-            {isOpen && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 overflow-y-auto"
-                    onClick={onClose}
-                >
-                    <div className="flex min-h-screen items-center justify-center p-4">
-                        {/* Backdrop */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
-                        />
+        <>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        key="task-detail-modal"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 overflow-y-auto"
+                        onClick={onClose}
+                    >
+                        <div className="flex min-h-screen items-center justify-center p-4">
+                            {/* Backdrop */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+                            />
 
-                        {/* Modal */}
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            transition={{ type: "spring", damping: 25 }}
-                            className="relative w-full max-w-5xl transform overflow-hidden rounded-lg bg-white shadow-xl"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="bg-white p-8 max-h-[95vh] overflow-y-auto">
-                                {/* Header */}
-                                <div className="flex items-center justify-between mb-6">
-                                    <h3 className="text-xl font-semibold text-gray-900">
-                                        {isNewTask ? 'Create New Task' : 'Task Details'}
-                                    </h3>
-                                    <motion.button
-                                        whileHover={{ scale: 1.1 }}
-                                        whileTap={{ scale: 0.9 }}
-                                        onClick={onClose}
-                                        className="text-gray-400 hover:text-gray-600 transition-colors"
-                                    >
-                                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </motion.button>
-                                </div>
+                            {/* Modal */}
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                                transition={{ type: "spring", damping: 25 }}
+                                className="relative w-full max-w-5xl transform overflow-hidden rounded-lg bg-white shadow-xl"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <div className="bg-white p-8 max-h-[95vh] overflow-y-auto">
+                                    {/* Header */}
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h3 className="text-xl font-semibold text-gray-900">
+                                            {isNewTask ? 'Create New Task' : 'Task Details'}
+                                        </h3>
+                                        <motion.button
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.9 }}
+                                            onClick={onClose}
+                                            className="text-gray-400 hover:text-gray-600 transition-colors"
+                                        >
+                                            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </motion.button>
+                                    </div>
 
-                                <div className="space-y-8">
-                                    {/* Status & Priority & Title */}
-                                    <MotionSection delay={0.1}>
-                                        <div className="flex items-center justify-self-start gap-4">
-                                            <StatusSelector
-                                                value={formData.status}
-                                                onChange={(value) => handleSaveField('status', value)}
-                                                options={STATUS_OPTIONS}
-                                                getColor={getStatusColor}
-                                                getBadgeColor={getStatusBadgeColor}
+                                    <div className="space-y-8">
+                                        {/* Status & Priority & Title */}
+                                        <MotionSection delay={0.1}>
+                                            <div className="flex items-center justify-self-start gap-4">
+                                                <StatusSelector
+                                                    key="status"
+                                                    value={formData.status}
+                                                    onChange={(value) => handleSaveField('status', value)}
+                                                    options={STATUS_OPTIONS}
+                                                    getColor={getStatusColor}
+                                                    getBadgeColor={getStatusBadgeColor}
+                                                    label="Task Status"
+                                                />
+                                                <StatusSelector
+                                                    key="priority"
+                                                    value={formData.priority}
+                                                    onChange={(value) => handleSaveField('priority', value)}
+                                                    options={PRIORITY_OPTIONS}
+                                                    getColor={getPriorityColor}
+                                                    getBadgeColor={getPriorityBadgeColor}
+                                                    label="Task Priority"
+                                                />
+                                            </div>
+
+                                            <EditableInput
+                                                value={formData.title}
+                                                onChange={(value) => handleSaveField('title', value)}
+                                                placeholder="Task title"
+                                                className="text-2xl font-bold"
                                             />
-                                            <StatusSelector
-                                                value={formData.priority}
-                                                onChange={(value) => handleSaveField('priority', value)}
-                                                options={PRIORITY_OPTIONS}
-                                                getColor={getPriorityColor}
-                                                getBadgeColor={getPriorityBadgeColor}
-                                            />
-                                        </div>
+                                        </MotionSection>
 
-                                        <EditableInput
-                                            value={formData.title}
-                                            onChange={(value) => handleSaveField('title', value)}
-                                            placeholder="Task title"
-                                            className="text-2xl font-bold"
-                                        />
-                                    </MotionSection>
+                                        {/* Project & Story Points */}
+                                        <MotionSection delay={0.15} className="grid grid-cols-2 gap-6">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Project
+                                                </label>
+                                                <select
+                                                    value={formData.project_id}
+                                                    onChange={(e) => handleSaveField('project_id', e.target.value)}
+                                                    className="w-full text-gray-900 border border-gray-300 rounded-lg px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+                                                    disabled={isLoading}
+                                                >
+                                                    <option value="">Select Project</option>
+                                                    {projects.map(project => (
+                                                        <option key={project.id} value={project.id}>
+                                                            {project.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
 
-                                    {/* Project & Story Points */}
-                                    <MotionSection delay={0.15} className="grid grid-cols-2 gap-6">
-                                        <div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Story Points
+                                                </label>
+                                                <EditableInput
+                                                    value={formData.story_points}
+                                                    onChange={(value) => handleSaveField('story_points', value)}
+                                                    placeholder="0"
+                                                    type="number"
+                                                    className="w-full font-medium border border-gray-400 rounded-lg px-1 py-1"
+                                                />
+                                            </div>
+                                        </MotionSection>
+
+                                        {/* Description */}
+                                        <MotionSection delay={0.25}>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Project
-                                            </label>
-                                            <select
-                                                value={formData.project_id}
-                                                onChange={(e) => handleSaveField('project_id', e.target.value)}
-                                                className="w-full text-gray-900 border border-gray-300 rounded-lg px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
-                                                disabled={isLoading}
-                                            >
-                                                <option value="">Select Project</option>
-                                                {projects.map(project => (
-                                                    <option key={project.id} value={project.id}>
-                                                        {project.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Story Points
+                                                Description Task
                                             </label>
                                             <EditableInput
-                                                value={formData.story_points}
-                                                onChange={(value) => handleSaveField('story_points', value)}
-                                                placeholder="0"
-                                                type="number"
-                                                className="w-full font-medium border border-gray-400 rounded-lg px-1 py-1"
+                                                value={formData.description}
+                                                onChange={(value) => handleSaveField('description', value)}
+                                                placeholder="Add task description..."
+                                                multiline
+                                                className="border border-gray-300 rounded-lg overflow-hidden min-h-[150px] bg-white"
                                             />
-                                        </div>
-                                    </MotionSection>
+                                        </MotionSection>
 
-                                    {/* Description */}
-                                    <MotionSection delay={0.25}>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Description Task
-                                        </label>
-                                        <EditableInput
-                                            value={formData.description}
-                                            onChange={(value) => handleSaveField('description', value)}
-                                            placeholder="Add task description..."
-                                            multiline
-                                            className="border border-gray-300 rounded-lg overflow-hidden min-h-[150px] bg-white"
-                                        />
-                                    </MotionSection>
+                                        <hr className="my-4" />
 
-                                    <hr className="my-4" />
-
-                                    {/* Notes */}
-                                    <MotionSection delay={0.3}>
-                                        <div className="flex items-center justify-between mb-2">
-                                            <label className="block text-sm font-medium text-gray-700">
-                                                Notes
-                                            </label>
-                                            <div className="flex items-center gap-3">
-                                                <span className={`text-sm ${saveStatusInfo.color}`}>
-                                                    {saveStatusInfo.text}
-                                                </span>
-                                                {!isNewTask && (
-                                                    <button
-                                                        onClick={saveNotes}
-                                                        disabled={isSavingNotes}
-                                                        className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                                    >
-                                                        {isSavingNotes ? 'Saving...' : 'Save Now'}
-                                                    </button>
-                                                )}
+                                        {/* Notes */}
+                                        <MotionSection delay={0.3}>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <label className="block text-sm font-medium text-gray-700">
+                                                    Notes
+                                                </label>
+                                                <div className="flex items-center gap-3">
+                                                    <span className={`text-sm ${saveStatusInfo.color}`}>
+                                                        {saveStatusInfo.text}
+                                                    </span>
+                                                    {!isNewTask && (
+                                                        <button
+                                                            onClick={saveNotes}
+                                                            disabled={isSavingNotes}
+                                                            className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                                        >
+                                                            {isSavingNotes ? 'Saving...' : 'Save Now'}
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div
-                                            ref={editorContainerRef}
-                                            className="border border-gray-300 rounded-lg overflow-hidden min-h-[300px] bg-white"
-                                        >
-                                            <div className="editor-container h-full">
-                                                <div id="editorjs" className="h-full"></div>
-                                            </div>
-                                        </div>
-                                    </MotionSection>
-
-                                    {/* Link Pull Request */}
-                                    <MotionSection delay={0.35}>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Link Pull Request
-                                        </label>
-                                        <EditableInput
-                                            value={formData.link_pull_request}
-                                            onChange={(value) => handleSaveField('link_pull_request', value)}
-                                            placeholder="https://github.com/..."
-                                            type="url"
-                                            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                                        />
-                                        {formData.link_pull_request && (
-                                            <a
-                                                href={formData.link_pull_request}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="mt-2 text-blue-600 hover:text-blue-800 underline break-all text-sm inline-block"
+                                            <div
+                                                ref={editorContainerRef}
+                                                className="border border-gray-300 rounded-lg overflow-hidden min-h-[300px] bg-white"
                                             >
-                                                Open Link in New Tab
-                                            </a>
-                                        )}
-                                    </MotionSection>
+                                                <div className="editor-container h-full">
+                                                    <div id="editorjs" className="h-full"></div>
+                                                </div>
+                                            </div>
+                                        </MotionSection>
 
-                                    {/* Action Buttons */}
-                                    <MotionSection delay={0.4} className="border-t pt-6 mt-6">
-                                        {isNewTask ? (
-                                            <div className="flex gap-3">
-                                                <motion.button
-                                                    whileHover={{ scale: 1.02 }}
-                                                    whileTap={{ scale: 0.98 }}
-                                                    onClick={handleCreateTask}
-                                                    className="flex-1 rounded-lg bg-blue-600 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                                        {/* Link Pull Request */}
+                                        <MotionSection delay={0.35}>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Link Pull Request
+                                            </label>
+                                            <EditableInput
+                                                value={formData.link_pull_request}
+                                                onChange={(value) => handleSaveField('link_pull_request', value)}
+                                                placeholder="https://github.com/..."
+                                                type="url"
+                                                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                            />
+                                            {formData.link_pull_request && (
+                                                <a
+                                                    href={formData.link_pull_request}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="mt-2 text-blue-600 hover:text-blue-800 underline break-all text-sm inline-block"
                                                 >
-                                                    <Save size={18} />
-                                                    Create Task
-                                                </motion.button>
-                                                <motion.button
-                                                    whileHover={{ scale: 1.02 }}
-                                                    whileTap={{ scale: 0.98 }}
-                                                    onClick={onClose}
-                                                    className="rounded-lg bg-gray-200 px-6 py-3 text-base font-medium text-gray-700 hover:bg-gray-300 transition-colors"
-                                                >
-                                                    Cancel
-                                                </motion.button>
-                                            </div>
-                                        ) : (
-                                            <div className="flex gap-3">
-                                                <motion.button
-                                                    whileHover={{ scale: 1.02 }}
-                                                    whileTap={{ scale: 0.98 }}
-                                                    onClick={toggleTaskStatus}
-                                                    className="flex-1 rounded-lg bg-blue-600 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 transition-colors"
-                                                >
-                                                    {formData.status === 'done' ? 'Mark as Todo' : 'Mark as Done'}
-                                                </motion.button>
-                                                <motion.button
-                                                    whileHover={{ scale: 1.02 }}
-                                                    whileTap={{ scale: 0.98 }}
-                                                    onClick={handleDeleteTask}
-                                                    className="rounded-lg bg-red-600 px-6 py-3 text-base font-medium text-white hover:bg-red-700 transition-colors"
-                                                >
-                                                    <Trash size={18} />
-                                                </motion.button>
-                                            </div>
-                                        )}
-                                    </MotionSection>
+                                                    Open Link in New Tab
+                                                </a>
+                                            )}
+                                        </MotionSection>
+
+                                        {/* Action Buttons */}
+                                        <MotionSection delay={0.4} className="border-t pt-6 mt-6">
+                                            {isNewTask ? (
+                                                <div className="flex gap-3">
+                                                    <motion.button
+                                                        whileHover={{ scale: 1.02 }}
+                                                        whileTap={{ scale: 0.98 }}
+                                                        onClick={handleCreateTask}
+                                                        className="flex-1 rounded-lg bg-blue-600 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                                                    >
+                                                        <Save size={18} />
+                                                        Create Task
+                                                    </motion.button>
+                                                    <motion.button
+                                                        whileHover={{ scale: 1.02 }}
+                                                        whileTap={{ scale: 0.98 }}
+                                                        onClick={onClose}
+                                                        className="rounded-lg bg-gray-200 px-6 py-3 text-base font-medium text-gray-700 hover:bg-gray-300 transition-colors"
+                                                    >
+                                                        Cancel
+                                                    </motion.button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex gap-3">
+                                                    <motion.button
+                                                        whileHover={{ scale: 1.02 }}
+                                                        whileTap={{ scale: 0.98 }}
+                                                        onClick={toggleTaskStatus}
+                                                        className="flex-1 rounded-lg bg-blue-600 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 transition-colors"
+                                                    >
+                                                        {formData.status === 'done' ? 'Mark as Todo' : 'Mark as Done'}
+                                                    </motion.button>
+                                                    <motion.button
+                                                        whileHover={{ scale: 1.02 }}
+                                                        whileTap={{ scale: 0.98 }}
+                                                        onClick={handleDeleteTask}
+                                                        className="rounded-lg bg-red-600 px-6 py-3 text-base font-medium text-white hover:bg-red-700 transition-colors"
+                                                    >
+                                                        <Trash size={18} />
+                                                    </motion.button>
+                                                </div>
+                                            )}
+                                        </MotionSection>
+                                    </div>
                                 </div>
-                            </div>
-                        </motion.div>
-                    </div>
-                </motion.div>
-            )}
-        </AnimatePresence>
+                            </motion.div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <ConfirmDeleteModal
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={confirmDelete}
+            />
+        </>
     );
 }
