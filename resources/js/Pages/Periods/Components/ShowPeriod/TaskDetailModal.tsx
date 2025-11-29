@@ -59,8 +59,6 @@ const getSaveStatusInfo = (status: SaveStatus, isNewTask: boolean) => {
     return statusMap[status];
 };
 
-
-// Motion Section Wrapper
 const MotionSection = memo(({ delay, children, className = "" }: {
     delay: number;
     children: React.ReactNode;
@@ -215,7 +213,6 @@ const EditableInput = memo(({
     );
 });
 
-// ==================== MAIN COMPONENT ====================
 export default function TaskDetailModal({
     isOpen,
     onClose,
@@ -223,7 +220,6 @@ export default function TaskDetailModal({
     periodId,
     isNewTask = false
 }: TaskDetailModalProps) {
-    // ==================== STATE ====================
     const [projects, setProjects] = useState<Project[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isSavingNotes, setIsSavingNotes] = useState(false);
@@ -240,12 +236,10 @@ export default function TaskDetailModal({
         task_date: ''
     });
 
-    // ==================== REFS ====================
     const editorRef = useRef<EditorJS | null>(null);
     const editorContainerRef = useRef<HTMLDivElement>(null);
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-    // ==================== MEMOIZED VALUES ====================
     const saveStatusInfo = useMemo(() =>
         getSaveStatusInfo(saveStatus, isNewTask),
         [saveStatus, isNewTask]
@@ -258,11 +252,10 @@ export default function TaskDetailModal({
         minHeight: 200,
     }), []);
 
-    // ==================== CALLBACKS ====================
     const fetchProjects = useCallback(async () => {
         try {
             setIsLoading(true);
-            const response = await fetch('/projects');
+            const response = await fetch('/project');
             if (response.ok) {
                 const data = await response.json();
                 setProjects(data);
@@ -417,7 +410,6 @@ export default function TaskDetailModal({
         handleSaveField('status', newStatus);
     }, [formData.status, handleSaveField]);
 
-    // ==================== EFFECTS ====================
     useEffect(() => {
         if (!isOpen || !task) return;
 
@@ -453,7 +445,6 @@ export default function TaskDetailModal({
         };
     }, [isOpen, task?.id, fetchProjects, initializeEditor]);
 
-    // ==================== RENDER ====================
     if (!task) return null;
 
     return (
