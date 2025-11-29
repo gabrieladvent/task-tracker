@@ -47,7 +47,7 @@ export default function Dashboard() {
                         >
                             <DashboardCard
                                 title="Projects"
-                                description="Coming soon"
+                                description="Manage your projects"
                                 icon={
                                     <svg
                                         className="h-8 w-8 text-gray-400"
@@ -63,7 +63,7 @@ export default function Dashboard() {
                                         />
                                     </svg>
                                 }
-                                isComingSoon
+                                href={route('projects.index')}
                             />
                         </motion.div>
 
@@ -98,8 +98,8 @@ export default function Dashboard() {
                     <WelcomeMessage
                         title="Welcome to Task Manager! 👋"
                         description="Get started by creating your first period. A period represents a time frame (like a sprint or month) where you can organize and track your tasks."
-                        ctaText="Go to Periods"
-                        ctaHref={route('periods.index')}
+                        ctaText="Go to Last Periods"
+                        ctaHref={route('periods.last')}
                     />
                 </div>
             </div>

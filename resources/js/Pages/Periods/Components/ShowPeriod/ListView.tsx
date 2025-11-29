@@ -57,17 +57,15 @@ export default function ListView({ tasksByDate, onAddTask, onTaskClick }: ListVi
                                             <div className="flex items-center gap-2">
                                                 <span className={`h-2 w-2 rounded-full ${getStatusColor(task.status)}`} />
                                                 <h4 className="font-medium text-gray-900">{task.title}</h4>
-                                                {task.story_points && (
                                                     <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
-                                                        {task.story_points} pts
+                                                        {task.story_points ?? 0} pts
                                                     </span>
-                                                )}
                                             </div>
-                                            {task.description && (
-                                                <p className="mt-1 text-sm text-gray-600">{task.description}</p>
+                                            {task.project && (
+                                                <p className="mt-1 text-sm text-gray-600">{task.project}</p>
                                             )}
                                             <div className="mt-2 flex items-center gap-2 text-xs">
-                                                <span className={`font-medium ${getPriorityColor(task.priority)}`}>
+                                                <span className={`font-medium ${getPriorityColor(task.priority)} p-1 rounded`}>
                                                     {task.priority.toUpperCase()}
                                                 </span>
                                             </div>

@@ -58,7 +58,9 @@ export default function Authenticated({
                                 </motion.div>
 
                                 <motion.div whileHover={{ scale: 1.05 }}>
-                                    <NavLink href="#" active={false}>
+                                    <NavLink
+                                        href={route('projects.index')}
+                                        active={route().current('projects.*')}>
                                         Projects
                                     </NavLink>
                                 </motion.div>

@@ -36,9 +36,9 @@ export const getStatusLabel = (status: string): string => {
 
 export const getPriorityColor = (priority: string): string => {
     const colors: Record<string, string> = {
-        low: "text-gray-600",
-        medium: "text-amber-600",
-        high: "text-red-600",
+        low: "bg-gray-500",
+        medium: "bg-amber-500",
+        high: "bg-red-500",
     };
     return colors[priority] || "text-gray-600";
 };

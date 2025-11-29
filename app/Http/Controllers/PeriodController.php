@@ -49,4 +49,25 @@ class PeriodController extends Controller
 
         return redirect()->route('periods.index');
     }
+
+    public function lastPeriod(): \Inertia\Response|\Illuminate\Http\RedirectResponse
+    {
+        $periods = $this->periodServices->getPeriodsWithStats();
+
+        if ($periods->isEmpty()) {
+            return Inertia::render('Periods/Index', [
+                'periods' => $periods,
+            ]);
+        }
+
+        $current = $periods->firstWhere('is_current', true);
+
+        if ($current) {
+            return redirect()->route('periods.show', $current['id']);
+        }
+
+        $last = $periods->first();
+
+        return redirect()->route('periods.show', $last['id']);
+    }
 }
