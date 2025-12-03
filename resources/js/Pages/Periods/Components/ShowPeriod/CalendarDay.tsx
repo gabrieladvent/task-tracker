@@ -8,25 +8,29 @@ interface CalendarDayProps {
     day: CalendarDayType;
     onAddTask: (date: string) => void;
     onTaskClick: (task: CalendarTask) => void;
-    activeTaskDate?: string | null; // Tambahkan prop ini
+    activeTaskDate?: string | null;
 }
 
 export default function CalendarDay({ day, onAddTask, onTaskClick, activeTaskDate }: CalendarDayProps) {
-    // Check apakah ini tanggal yang sama dengan task yang di-drag
     const isSameDate = activeTaskDate === day.date;
+
+    const dayOfWeek = new Date(day.date).getDay();
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
     const { setNodeRef, isOver } = useDroppable({
         id: day.date,
-        disabled: !day.is_in_period || isSameDate, // Disable drop jika tanggal sama
+        disabled: !day.is_in_period || isSameDate,
         data: { date: day.date }
     });
 
-    // Tentukan style berdasarkan kondisi
     const getDropZoneStyle = () => {
         if (!day.is_in_period) return 'bg-gray-100';
-        if (isSameDate && isOver) return 'bg-red-50 ring-2 ring-red-400'; // Visual untuk invalid drop
-        if (isSameDate) return 'bg-gray-50 opacity-50'; // Visual untuk tanggal yang sama
-        if (isOver) return 'ring-2 ring-green-400 bg-green-50'; // Valid drop zone
+        if (isSameDate && isOver) return 'bg-red-50 ring-2 ring-red-400';
+        if (isSameDate) return 'bg-gray-50 opacity-50';
+        if (isOver) return 'ring-2 ring-green-400 bg-green-50';
+
+        if (isWeekend) return 'bg-gray-200 hover:bg-gray-100';
+
         return 'bg-white hover:bg-gray-50';
     };
 
@@ -37,7 +41,9 @@ export default function CalendarDay({ day, onAddTask, onTaskClick, activeTaskDat
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2 }}
             className={`min-h-32 border p-2 ${getDropZoneStyle()} ${day.is_today
-                    ? 'border-2 border-blue-500 shadow-sm'
+                ? 'border-2 border-blue-500 shadow-sm'
+                : isWeekend
+                    ? 'border-blue-200'
                     : 'border-gray-200'
                 } transition-all duration-200 cursor-default relative`}
         >
@@ -66,7 +72,12 @@ export default function CalendarDay({ day, onAddTask, onTaskClick, activeTaskDat
             )}
 
             <div className="mb-1 flex items-center justify-between">
-                <div className={`text-sm font-medium ${day.is_today ? 'text-blue-600' : 'text-gray-900'}`}>
+                <div className={`text-sm font-medium ${day.is_today
+                        ? 'text-blue-600'
+                        : isWeekend
+                            ? 'text-blue-700'
+                            : 'text-gray-900'
+                    }`}>
                     {day.day}
                 </div>
                 <div className="flex items-center gap-1">
