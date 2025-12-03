@@ -6,8 +6,8 @@ enum StatusEnum: string
 {
     case TODO = 'todo';
     case IN_PROGRESS = 'in_progress';
-    case ON_HOLD = 'on_hold';
     case CODE_REVIEW = 'code_review';
+    case ON_HOLD = 'on_hold';
     case DONE = 'done';
     case CANCELLED = 'cancelled';
 
@@ -32,6 +32,18 @@ enum StatusEnum: string
             self::CODE_REVIEW => 'Review',
             self::DONE => 'Done',
             self::CANCELLED => 'Cancelled',
+        };
+    }
+
+    public function sortOrder(): int
+    {
+        return match ($this) {
+            self::TODO => 1,
+            self::IN_PROGRESS => 2,
+            self::CODE_REVIEW => 3,
+            self::ON_HOLD => 4,
+            self::DONE => 5,
+            self::CANCELLED => 6,
         };
     }
 }
