@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PeriodController;
+use App\Http\Controllers\PeriodReportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
@@ -41,6 +42,16 @@ Route::middleware('auth')->group(function () {
     Route::prefix('tasks')->group(function () {
         Route::put('/{task}', [TaskController::class, 'update'])->name('tasks.update');
         Route::delete('/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+    });
+
+    Route::get('/reports', [PeriodReportController::class, 'indexAll'])->name('reports.index');
+
+    Route::prefix('periods/{period}/reports')->group(function () {
+        Route::get('/', [PeriodReportController::class, 'index'])->name('periods.reports.index');
+        Route::post('/', [PeriodReportController::class, 'store'])->name('periods.reports.store');
+        Route::get('/{report}', [PeriodReportController::class, 'show'])->name('periods.reports.show');
+        Route::get('/{report}/export', [PeriodReportController::class, 'export'])->name('periods.reports.export');
+        Route::delete('/{report}', [PeriodReportController::class, 'destroy'])->name('periods.reports.destroy');
     });
 });
 

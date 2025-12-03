@@ -74,7 +74,7 @@ export default function Dashboard() {
                         >
                             <DashboardCard
                                 title="Reports"
-                                description="Coming soon"
+                                description="View reports of your work"
                                 icon={
                                     <svg
                                         className="h-8 w-8 text-gray-400"
@@ -90,7 +90,7 @@ export default function Dashboard() {
                                         />
                                     </svg>
                                 }
-                                isComingSoon
+                                href={route('reports.index')}
                             />
                         </motion.div>
                     </div>

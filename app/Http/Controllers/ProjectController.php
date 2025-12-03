@@ -12,6 +12,7 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search', '');
+        $perPage = $request->input('per_page', 12); // Default 12 untuk grid 3/4 kolom
 
         $projects = Project::query()
             ->when($search, function ($query, $search) {
@@ -19,13 +20,20 @@ class ProjectController extends Controller
                     ->orWhere('description', 'like', "%{$search}%");
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(12)
+            ->paginate($perPage)
             ->withQueryString();
 
         return Inertia::render('Project/Index', [
-            'projects' => $projects,
+            'projects' => $projects->through(fn ($project) => [
+                'id' => $project->id,
+                'name' => $project->name,
+                'description' => $project->description,
+                'color' => $project->color,
+                'created_at' => $project->created_at->format('d M Y H:i'),
+            ]),
             'filters' => [
                 'search' => $search,
+                'per_page' => $perPage,
             ],
         ]);
     }

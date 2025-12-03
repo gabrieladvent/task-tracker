@@ -68,7 +68,7 @@ export default function Authenticated({
                                 <motion.div whileHover={{ scale: 1.05 }}>
                                     <NavLink
                                         href={route('periods.index')}
-                                        active={route().current('periods.*')}
+                                        active={route().current('periods.*') && !route().current('periods.reports.*')}
                                     >
                                         Periods
                                     </NavLink>
@@ -79,6 +79,15 @@ export default function Authenticated({
                                         href={route('projects.index')}
                                         active={route().current('projects.*')}>
                                         Projects
+                                    </NavLink>
+                                </motion.div>
+
+                                <motion.div whileHover={{ scale: 1.05 }}>
+                                    <NavLink
+                                        href={route('reports.index')}
+                                        active={route().current('reports.*')}
+                                    >
+                                        Reports
                                     </NavLink>
                                 </motion.div>
                             </div>
