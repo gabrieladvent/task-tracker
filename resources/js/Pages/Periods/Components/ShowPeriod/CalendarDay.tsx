@@ -24,9 +24,13 @@ export default function CalendarDay({ day, onAddTask, onTaskClick, activeTaskDat
     // Tentukan style berdasarkan kondisi
     const getDropZoneStyle = () => {
         if (!day.is_in_period) return 'bg-gray-100';
-        if (isSameDate && isOver) return 'bg-red-50 ring-2 ring-red-400'; // Visual untuk invalid drop
-        if (isSameDate) return 'bg-gray-50 opacity-50'; // Visual untuk tanggal yang sama
-        if (isOver) return 'ring-2 ring-green-400 bg-green-50'; // Valid drop zone
+
+        if (isSameDate && isOver) return 'bg-red-50 ring-2 ring-red-400';
+        if (isSameDate) return 'bg-gray-50 opacity-50';
+        if (isOver) return 'ring-2 ring-green-400 bg-green-50';
+
+        if (isWeekend) return 'bg-red-50 hover:bg-red-100';
+
         return 'bg-white hover:bg-gray-50';
     };
 
@@ -105,7 +109,7 @@ export default function CalendarDay({ day, onAddTask, onTaskClick, activeTaskDat
                     transition={{ delay: 0.1 }}
                     className="mt-2 space-y-1"
                 >
-                    {day.tasks!.slice(0, 3).map((task, index) => (
+                    {day.tasks!.slice(0, 4).map((task, index) => (
                         <DraggableTask
                             key={task.id}
                             task={task}
@@ -113,13 +117,13 @@ export default function CalendarDay({ day, onAddTask, onTaskClick, activeTaskDat
                             onClick={onTaskClick}
                         />
                     ))}
-                    {day.tasks!.length > 3 && (
+                    {day.tasks!.length > 4 && (
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             className="px-1.5 text-[10px] text-gray-500"
                         >
-                            +{day.tasks!.length - 3} more
+                            +{day.tasks!.length - 4} more
                         </motion.div>
                     )}
                 </motion.div>

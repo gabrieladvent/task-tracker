@@ -12,7 +12,7 @@ class PeriodServices
     {
         return Period::withCount([
             'tasks',
-            'tasks as completed_tasks_count' => fn ($q) => $q->where('status', 'done'),
+            'tasks as completed_tasks_count' => fn ($query) => $query->where('status', 'done'),
         ])
             ->orderByDesc('start_date')
             ->get()
@@ -32,7 +32,7 @@ class PeriodServices
     {
         $period->loadCount([
             'tasks',
-            'tasks as completed_tasks_count' => fn ($q) => $q->where('status', 'done'),
+            'tasks as completed_tasks_count' => fn ($query) => $query->where('status', 'done'),
         ]);
 
         return [
@@ -65,19 +65,22 @@ class PeriodServices
                 'date' => $date,
                 'day_name' => Carbon::parse($date)->format('l'),
                 'formatted_date' => Carbon::parse($date)->format('d M Y'),
-                'tasks' => $tasks->map(fn ($task) => [
-                    'id' => $task->id,
-                    'title' => $task->title,
-                    'description' => $task->description,
-                    'link_pull_request' => $task->link_pull_request,
-                    'notes' => $task->notes,
-                    'status' => $task->status->value,
-                    'priority' => $task->priority->value,
-                    'story_points' => $task->story_points,
-                    'project_id' => $task->project_id,
-                    'project' => $task->project?->name,
-                    'task_date' => $task->task_date->format('Y-m-d'),
-                ])->values(),
+                'tasks' => $tasks
+                    ->sortBy(fn ($task) => $task->status->sortOrder())
+                    ->map(fn ($task) => [
+                        'id' => $task->id,
+                        'title' => $task->title,
+                        'description' => $task->description,
+                        'link_pull_request' => $task->link_pull_request,
+                        'notes' => $task->notes,
+                        'status' => $task->status->value,
+                        'priority' => $task->priority->value,
+                        'story_points' => $task->story_points,
+                        'project_id' => $task->project_id,
+                        'project' => $task->project?->name,
+                        'task_date' => $task->task_date->format('Y-m-d'),
+                    ])
+                    ->values(),
             ])
             ->values();
     }
@@ -141,18 +144,23 @@ class PeriodServices
         });
 
         $formattedTasks = $tasksByDate->map(function ($dateTasks) {
-            return $dateTasks->map(fn ($task) => [
-                'id' => $task->id,
-                'title' => $task->title,
-                'status' => $task->status->value,
-                'priority' => $task->priority->value,
-                'story_points' => $task->story_points,
-                'project' => $task->project?->name,
-                'project_id' => $task->project_id,
-                'description' => $task->description,
-                'link_pull_request' => $task->link_pull_request,
-                'notes' => $task->notes,
-            ])->toArray();
+            return $dateTasks
+                ->sortBy(fn ($task) => $task->status->sortOrder())
+                ->map(fn ($task) => [
+                    'id' => $task->id,
+                    'title' => $task->title,
+                    'status' => $task->status->value,
+                    'priority' => $task->priority->value,
+                    'story_points' => $task->story_points,
+                    'project' => $task->project?->name,
+                    'project_id' => $task->project_id,
+                    'description' => $task->description,
+                    'link_pull_request' => $task->link_pull_request,
+                    'notes' => $task->notes,
+                    'task_date' => $task->task_date->format('Y-m-d'),
+                ])
+                ->values()
+                ->toArray();
         });
 
         return [
