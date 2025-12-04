@@ -10,17 +10,17 @@ export default function EmptyState({ onCreateClick }: EmptyStateProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="overflow-hidden bg-white shadow-sm sm:rounded-lg"
+            className="overflow-hidden bg-white dark:bg-gray-800 dark:text-gray-100 shadow-sm sm:rounded-lg"
         >
             <div className="p-12 text-center">
                 <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                    className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100"
+                    className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-500"
                 >
                     <svg
-                        className="h-8 w-8 text-gray-400"
+                        className="h-8 w-8 text-gray-400 dark:bg-gray-500 dark:text-gray-200"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -37,7 +37,7 @@ export default function EmptyState({ onCreateClick }: EmptyStateProps) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.3 }}
-                    className="text-gray-500 mb-4"
+                    className="text-gray-500 dark:text-gray-400 mb-4"
                 >
                     No periods yet. Create your first period to get started.
                 </motion.p>
@@ -48,7 +48,7 @@ export default function EmptyState({ onCreateClick }: EmptyStateProps) {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={onCreateClick}
-                    className="rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors"
+                    className="rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors dark:bg-gray-100 dark:text-gray-800"
                 >
                     Create Your First Period
                 </motion.button>

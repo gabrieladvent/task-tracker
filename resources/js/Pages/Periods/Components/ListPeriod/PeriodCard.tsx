@@ -20,7 +20,7 @@ export default function PeriodCard({ period, index }: PeriodCardProps) {
         >
             <Link
                 href={`/periods/${period.id}`}
-                className="block overflow-hidden bg-white shadow-sm transition hover:shadow-md sm:rounded-lg"
+                className="block overflow-hidden bg-white shadow-sm dark:shadow-gray-500 transition hover:shadow-md sm:rounded-lg dark:bg-gray-800"
             >
                 <motion.div
                     className="p-6"
@@ -28,7 +28,7 @@ export default function PeriodCard({ period, index }: PeriodCardProps) {
                     transition={{ duration: 0.2 }}
                 >
                     <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                             {period.name}
                         </h3>
 
@@ -44,19 +44,19 @@ export default function PeriodCard({ period, index }: PeriodCardProps) {
                         )}
                     </div>
 
-                    <p className="mt-1 text-sm text-gray-600">
+                    <p className="mt-1 text-sm text-gray-500">
                         {period.start_date} - {period.end_date}
                     </p>
 
                     <div className="mt-4 flex items-center justify-between">
                         <div>
-                            <p className="text-2xl font-bold text-gray-900">
+                            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                                 {period.completed_tasks_count}
-                                <span className="text-base font-normal text-gray-600">
+                                <span className="text-base font-normal text-gray-600 dark:text-gray-300">
                                     {' '}/ {period.tasks_count}
                                 </span>
                             </p>
-                            
+
                             <p className="text-xs text-gray-500">
                                 Tasks Completed
                             </p>

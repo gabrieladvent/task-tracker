@@ -55,10 +55,10 @@ export default function ShowPeriod({ period, tasksByDate, calendarData }: Props)
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                 >
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-100">
                         {period.name}
                     </h2>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                         {period.start_date} - {period.end_date}
                     </p>
                 </motion.div>

@@ -109,7 +109,7 @@ export default function CalendarView({ calendarData, onAddTask, onTaskClick, per
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="overflow-hidden bg-white shadow-sm sm:rounded-lg"
+                    className="overflow-hidden bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg"
                 >
                     <div className="p-6">
 
@@ -119,23 +119,13 @@ export default function CalendarView({ calendarData, onAddTask, onTaskClick, per
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => setShowGenerateModal(true)}
-                                className="flex items-center gap-2 rounded-lg bg-gray-600 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors"
+                                className="flex items-center gap-2 rounded-lg dark:bg-gray-100 dark:text-gray-800 bg-gray-600 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors"
                             >
                                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                                 Generate Report
                             </motion.button>
-                        </div>
-
-                        {/* Info Banner */}
-                        <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center gap-2">
-                            <svg className="h-5 w-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <p className="text-sm text-blue-800">
-                                <strong>Tip:</strong> Drag and drop tasks to copy them to different dates
-                            </p>
                         </div>
 
                         <div className="grid grid-cols-7 gap-1">
@@ -145,7 +135,7 @@ export default function CalendarView({ calendarData, onAddTask, onTaskClick, per
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: 0.2 }}
-                                    className="p-2 text-center text-xs font-medium text-gray-500"
+                                    className="p-2 text-center text-xs font-medium text-gray-500 dark:text-gray-200"
                                 >
                                     {day}
                                 </motion.div>
@@ -168,10 +158,10 @@ export default function CalendarView({ calendarData, onAddTask, onTaskClick, per
 
                 <DragOverlay>
                     {activeTask ? (
-                        <div className="bg-white rounded px-3 py-2 shadow-2xl border-2 border-blue-400 transform rotate-3">
-                            <div className="text-sm font-medium text-gray-900">{activeTask.title}</div>
+                        <div className="bg-white dark:bg-gray-800 rounded px-3 py-2 shadow-2xl border-2 border-blue-400 dark:border-blue-500 transform rotate-3">
+                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{activeTask.title}</div>
                             {activeTask.project && (
-                                <div className="text-xs text-gray-600 mt-1">{activeTask.project}</div>
+                                <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">{activeTask.project}</div>
                             )}
                         </div>
                     ) : null}

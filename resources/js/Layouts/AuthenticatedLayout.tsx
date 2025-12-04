@@ -33,7 +33,7 @@ export default function Authenticated({
     };
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
             <Toaster />
 
             {/* NAVBAR - STICKY */}
@@ -41,7 +41,7 @@ export default function Authenticated({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.35 }}
-                className="sticky top-0 z-50 border-b border-gray-100 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900"
+                className="sticky top-0 z-50 border-b border-gray-100 bg-white shadow-sm dark:shadow-gray-600 dark:border-gray-800 dark:bg-gray-900"
             >
                 <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 items-center justify-between">
@@ -242,7 +242,7 @@ export default function Authenticated({
             )}
 
             <main>
-                <div className="w-full">
+                <div className="w-full dark:bg-gray-900">
                     {children}
                 </div>
             </main>

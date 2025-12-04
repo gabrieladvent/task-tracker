@@ -51,10 +51,10 @@ const getSaveStatusInfo = (status: SaveStatus, isNewTask: boolean) => {
     }
 
     const statusMap = {
-        saving: { text: 'Saving...', color: 'text-yellow-600' },
-        saved: { text: 'Saved!', color: 'text-green-600' },
-        error: { text: 'Save failed', color: 'text-red-600' },
-        idle: { text: 'Auto-saves when you stop typing', color: 'text-gray-500' }
+        saving: { text: 'Saving...', color: 'text-yellow-600 dark:text-yellow-400' },
+        saved: { text: 'Saved!', color: 'text-green-600 dark:text-green-400' },
+        error: { text: 'Save failed', color: 'text-red-600 dark:text-red-400' },
+        idle: { text: 'Auto-saves when you stop typing', color: 'text-gray-500 dark:text-gray-400' }
     };
 
     return statusMap[status];
@@ -175,7 +175,7 @@ const EditableInput = memo(({
             onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setTempValue(e.target.value),
             onBlur: handleSave,
             onKeyDown: handleKeyDown,
-            className: `w-full border-2 border-blue-500 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 ${className}`,
+            className: `w-full border-2 border-blue-500 dark:border-blue-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 dark:bg-gray-700 ${className}`,
             placeholder
         };
 
@@ -200,8 +200,8 @@ const EditableInput = memo(({
     }
 
     const displayValue = value || placeholder;
-    const displayClass = !value ? 'text-gray-400 italic' : 'text-gray-900';
-    const baseClass = `cursor-text hover:bg-gray-50 rounded-lg px-4 py-3 transition-colors border-2 border-transparent hover:border-gray-300 ${displayClass} ${className}`;
+    const displayClass = !value ? 'text-gray-400 dark:text-gray-500 italic' : 'text-gray-900 dark:text-gray-100';
+    const baseClass = `cursor-text hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-4 py-3 transition-colors border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 ${displayClass} ${className}`;
 
     if (multiline) {
         return (
@@ -485,20 +485,20 @@ export default function TaskDetailModal({
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
                                 transition={{ type: "spring", damping: 25 }}
-                                className="relative w-full max-w-5xl transform overflow-hidden rounded-lg bg-white shadow-xl"
+                                className="relative w-full max-w-5xl transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-xl"
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                <div className="bg-white p-8 max-h-[95vh] overflow-y-auto">
+                                <div className="bg-white dark:bg-gray-800 p-8 max-h-[95vh] overflow-y-auto">
                                     {/* Header */}
                                     <div className="flex items-center justify-between mb-6">
-                                        <h3 className="text-xl font-semibold text-gray-900">
+                                        <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                                             {isNewTask ? 'Create New Task' : 'Task Details'}
                                         </h3>
                                         <motion.button
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.9 }}
                                             onClick={onClose}
-                                            className="text-gray-400 hover:text-gray-600 transition-colors"
+                                            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                                         >
                                             <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -541,13 +541,13 @@ export default function TaskDetailModal({
                                         {/* Project & Story Points */}
                                         <MotionSection delay={0.15} className="grid grid-cols-2 gap-6">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                                     Project
                                                 </label>
                                                 <select
                                                     value={formData.project_id}
                                                     onChange={(e) => handleSaveField('project_id', e.target.value)}
-                                                    className="w-full text-gray-900 border border-gray-300 rounded-lg px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+                                                    className="w-full text-gray-900 dark:text-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 cursor-pointer"
                                                     disabled={isLoading}
                                                 >
                                                     <option value="">Select Project</option>
@@ -587,7 +587,7 @@ export default function TaskDetailModal({
                                             />
                                         </MotionSection>
 
-                                        <hr className="my-4" />
+                                        <hr className="my-4 border-gray-200 dark:border-gray-700" />
 
                                         {/* Notes */}
                                         <MotionSection delay={0.3}>
@@ -603,7 +603,7 @@ export default function TaskDetailModal({
                                                         <button
                                                             onClick={saveNotes}
                                                             disabled={isSavingNotes}
-                                                            className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                                            className="text-sm bg-blue-600 dark:bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                                         >
                                                             {isSavingNotes ? 'Saving...' : 'Save Now'}
                                                         </button>
@@ -612,7 +612,7 @@ export default function TaskDetailModal({
                                             </div>
                                             <div
                                                 ref={editorContainerRef}
-                                                className="border border-gray-300 rounded-lg overflow-hidden min-h-[300px] bg-white"
+                                                className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden min-h-[300px] bg-white dark:bg-gray-800"
                                             >
                                                 <div className="editor-container h-full">
                                                     <div id="editorjs" className="h-full"></div>
@@ -645,14 +645,14 @@ export default function TaskDetailModal({
                                         </MotionSection>
 
                                         {/* Action Buttons */}
-                                        <MotionSection delay={0.4} className="border-t pt-6 mt-6">
+                                        <MotionSection delay={0.4} className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
                                             {isNewTask ? (
                                                 <div className="flex gap-3">
                                                     <motion.button
                                                         whileHover={{ scale: 1.02 }}
                                                         whileTap={{ scale: 0.98 }}
                                                         onClick={handleCreateTask}
-                                                        className="flex-1 rounded-lg bg-blue-600 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                                                        className="flex-1 rounded-lg bg-blue-600 dark:bg-blue-500 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
                                                     >
                                                         <Save size={18} />
                                                         Create Task
@@ -661,7 +661,7 @@ export default function TaskDetailModal({
                                                         whileHover={{ scale: 1.02 }}
                                                         whileTap={{ scale: 0.98 }}
                                                         onClick={onClose}
-                                                        className="rounded-lg bg-gray-200 px-6 py-3 text-base font-medium text-gray-700 hover:bg-gray-300 transition-colors"
+                                                        className="rounded-lg bg-gray-200 dark:bg-gray-700 px-6 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                                                     >
                                                         Cancel
                                                     </motion.button>
@@ -680,7 +680,7 @@ export default function TaskDetailModal({
                                                         whileHover={{ scale: 1.02 }}
                                                         whileTap={{ scale: 0.98 }}
                                                         onClick={handleDeleteTask}
-                                                        className="rounded-lg bg-red-600 px-6 py-3 text-base font-medium text-white hover:bg-red-700 transition-colors"
+                                                        className="rounded-lg bg-red-600 dark:bg-red-500 px-6 py-3 text-base font-medium text-white hover:bg-red-700 dark:hover:bg-red-600 transition-colors"
                                                     >
                                                         <Trash size={18} />
                                                     </motion.button>
