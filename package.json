@@ -42,10 +42,12 @@
         "@editorjs/paragraph": "^2.11.7",
         "@editorjs/quote": "^2.7.6",
         "@editorjs/warning": "^1.4.1",
+        "clsx": "^2.1.1",
         "date-fns": "^4.1.0",
         "framer-motion": "^12.23.24",
         "lucide-react": "^0.555.0",
         "react-date-range": "^2.0.1",
-        "react-hot-toast": "^2.6.0"
+        "react-hot-toast": "^2.6.0",
+        "tailwind-merge": "^3.4.0"
     }
 }

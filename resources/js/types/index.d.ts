@@ -5,10 +5,13 @@ export interface User {
     email_verified_at?: string;
 }
 
+export type Appearance = "light" | "dark" | "system";
+
 export type PageProps<
-    T extends Record<string, unknown> = Record<string, unknown>,
+    T extends Record<string, unknown> = Record<string, unknown>
 > = T & {
     auth: {
         user: User;
     };
+    appearance?: Appearance;
 };

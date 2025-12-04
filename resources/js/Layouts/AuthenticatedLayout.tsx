@@ -6,6 +6,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
+import ThemeToggle from '@/Components/ThemeToggle';
 
 export default function Authenticated({
     header,
@@ -40,7 +41,7 @@ export default function Authenticated({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.35 }}
-                className="sticky top-0 z-50 border-b border-gray-100 bg-white shadow-sm"
+                className="sticky top-0 z-50 border-b border-gray-100 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900"
             >
                 <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 items-center justify-between">
@@ -50,7 +51,7 @@ export default function Authenticated({
                             <div className="flex shrink-0 items-center">
                                 <motion.div whileHover={{ scale: 1.04 }}>
                                     <Link href="/">
-                                        <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
+                                        <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
                                     </Link>
                                 </motion.div>
                             </div>
@@ -94,14 +95,16 @@ export default function Authenticated({
                         </div>
 
                         {/* PROFILE DROPDOWN */}
-                        <div className="hidden sm:flex sm:items-center">
-                            <div className="relative ml-3">
+                        <div className="hidden sm:flex sm:items-center sm:space-x-2">
+                            <ThemeToggle />
+
+                            <div className="relative">
                                 <Dropdown>
                                     <Dropdown.Trigger>
                                         <motion.button
                                             whileHover={{ scale: 1.03 }}
                                             whileTap={{ scale: 0.97 }}
-                                            className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-600"
+                                            className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300"
                                         >
                                             {user.name}
                                             <svg
@@ -198,8 +201,13 @@ export default function Authenticated({
                             </div>
 
                             <div className="border-t border-gray-200 pb-1 pt-4">
+                                <div className="px-4 pb-3">
+                                    <div className="text-sm font-medium text-gray-500 mb-2">Theme</div>
+                                    <ThemeToggle />
+                                </div>
+
                                 <div className="px-4">
-                                    <div className="text-base font-medium text-gray-800">
+                                    <div className="text-base font-medium text-gray-800 dark:text-gray-200">
                                         {user.name}
                                     </div>
                                     <div className="text-sm font-medium text-gray-500">
