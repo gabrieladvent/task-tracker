@@ -95,7 +95,7 @@ export default function Index({ projects, filters }: Props) {
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     onClick={handleCreate}
-                                    className="inline-flex items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white transition-all duration-300 ease-in-out hover:bg-gray-700"
+                                    className="inline-flex items-center gap-2 rounded-md bg-gray-800 dark:bg-gray-100 dark:text-gray-800 px-4 py-2 text-sm font-medium text-white transition-all duration-300 ease-in-out hover:bg-gray-700"
                                 >
                                     <Plus size={20} />
                                     New Project

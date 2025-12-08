@@ -23,9 +23,9 @@ export default function ListView({ tasksByDate, onAddTask, onTaskClick }: ListVi
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="overflow-hidden bg-white dark:bg-gray-800 shadow-sm dark:shadow-gray-900/30 sm:rounded-lg border border-gray-200 dark:border-gray-700"
+                        className="overflow-hidden bg-white dark:bg-slate-800/90 shadow-sm dark:shadow-slate-900/30 sm:rounded-lg border border-gray-200 dark:border-slate-700"
                     >
-                        <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 p-4 flex items-center justify-between">
+                        <div className="border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/60 p-4 flex items-center justify-between">
                             <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                                 {dateGroup.day_name}, {dateGroup.formatted_date}
                             </h3>
@@ -42,7 +42,7 @@ export default function ListView({ tasksByDate, onAddTask, onTaskClick }: ListVi
                             </motion.button>
                         </div>
 
-                        <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                        <div className="divide-y divide-gray-200 dark:divide-slate-700">
                             {dateGroup.tasks.map((task, taskIndex) => (
                                 <motion.div
                                     key={task.id}
@@ -57,7 +57,7 @@ export default function ListView({ tasksByDate, onAddTask, onTaskClick }: ListVi
                                             <div className="flex items-center gap-2">
                                                 <span className={`h-2.5 w-2.5 rounded-full ${getStatusColor(task.status)} shadow-sm`} />
                                                 <h4 className="font-medium text-gray-900 dark:text-gray-100">{task.title}</h4>
-                                                <span className="rounded-full bg-gray-100 dark:bg-gray-700 px-2 py-0.5 text-xs font-medium text-gray-600 dark:text-gray-300">
+                                                <span className="rounded-full bg-gray-100 dark:bg-slate-700/70 px-2 py-0.5 text-xs font-medium text-gray-600 dark:text-gray-200">
                                                     {task.story_points ?? 0} pts
                                                 </span>
                                             </div>
@@ -65,7 +65,7 @@ export default function ListView({ tasksByDate, onAddTask, onTaskClick }: ListVi
                                                 <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{task.project}</p>
                                             )}
                                             <div className="mt-2 flex items-center gap-2 text-xs">
-                                                <span className={`font-medium ${getPriorityColor(task.priority)} px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-700/50`}>
+                                                <span className={`font-medium ${getPriorityColor(task.priority)} px-2 py-1 rounded-md bg-gray-100 dark:bg-slate-700/60`}>
                                                     {task.priority.toUpperCase()}
                                                 </span>
                                             </div>

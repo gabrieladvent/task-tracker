@@ -109,7 +109,7 @@ export default function CalendarView({ calendarData, onAddTask, onTaskClick, per
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="overflow-hidden bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg"
+                    className="overflow-hidden bg-white dark:bg-slate-800/90 shadow-sm sm:rounded-lg"
                 >
                     <div className="p-6">
 
@@ -119,7 +119,7 @@ export default function CalendarView({ calendarData, onAddTask, onTaskClick, per
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => setShowGenerateModal(true)}
-                                className="flex items-center gap-2 rounded-lg dark:bg-gray-100 dark:text-gray-800 bg-gray-600 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors"
+                                className="flex items-center gap-2 rounded-lg bg-gray-600 dark:bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 dark:hover:bg-slate-600 transition-colors"
                             >
                                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -135,7 +135,7 @@ export default function CalendarView({ calendarData, onAddTask, onTaskClick, per
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: 0.2 }}
-                                    className="p-2 text-center text-xs font-medium text-gray-500 dark:text-gray-200"
+                                    className="p-2 text-center text-xs font-medium text-gray-500 dark:text-gray-300"
                                 >
                                     {day}
                                 </motion.div>
