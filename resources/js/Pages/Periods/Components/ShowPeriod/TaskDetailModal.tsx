@@ -175,7 +175,7 @@ const EditableInput = memo(({
             onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setTempValue(e.target.value),
             onBlur: handleSave,
             onKeyDown: handleKeyDown,
-            className: `w-full border-2 border-blue-500 dark:border-blue-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 dark:bg-gray-700 ${className}`,
+            className: `w-full border-2 border-blue-500 dark:border-blue-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 dark:bg-slate-700 ${className}`,
             placeholder
         };
 
@@ -541,13 +541,13 @@ export default function TaskDetailModal({
                                         {/* Project & Story Points */}
                                         <MotionSection delay={0.15} className="grid grid-cols-2 gap-6">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                                                     Project
                                                 </label>
                                                 <select
                                                     value={formData.project_id}
                                                     onChange={(e) => handleSaveField('project_id', e.target.value)}
-                                                    className="w-full text-gray-900 dark:text-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 cursor-pointer"
+                                                    className="w-full text-gray-900 dark:text-gray-100 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 cursor-pointer"
                                                     disabled={isLoading}
                                                 >
                                                     <option value="">Select Project</option>
@@ -575,7 +575,7 @@ export default function TaskDetailModal({
 
                                         {/* Description */}
                                         <MotionSection delay={0.25}>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                                                 Description Task
                                             </label>
                                             <EditableInput
@@ -583,7 +583,7 @@ export default function TaskDetailModal({
                                                 onChange={(value) => handleSaveField('description', value)}
                                                 placeholder="Add task description..."
                                                 multiline
-                                                className="border border-gray-300 rounded-lg overflow-hidden min-h-[150px] bg-white"
+                                                className="border border-gray-300 dark:border-slate-600 rounded-lg overflow-hidden min-h-[150px] bg-white dark:bg-slate-800"
                                             />
                                         </MotionSection>
 
@@ -592,7 +592,7 @@ export default function TaskDetailModal({
                                         {/* Notes */}
                                         <MotionSection delay={0.3}>
                                             <div className="flex items-center justify-between mb-2">
-                                                <label className="block text-sm font-medium text-gray-700">
+                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                                                     Notes
                                                 </label>
                                                 <div className="flex items-center gap-3">
@@ -612,7 +612,7 @@ export default function TaskDetailModal({
                                             </div>
                                             <div
                                                 ref={editorContainerRef}
-                                                className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden min-h-[300px] bg-white dark:bg-gray-800"
+                                                className="border border-gray-300 dark:border-slate-600 rounded-lg overflow-hidden min-h-[300px] bg-white dark:bg-slate-800 dark:text-gray-100"
                                             >
                                                 <div className="editor-container h-full">
                                                     <div id="editorjs" className="h-full"></div>
@@ -622,7 +622,7 @@ export default function TaskDetailModal({
 
                                         {/* Link Pull Request */}
                                         <MotionSection delay={0.35}>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                                                 Link Pull Request
                                             </label>
                                             <EditableInput
@@ -672,7 +672,7 @@ export default function TaskDetailModal({
                                                         whileHover={{ scale: 1.02 }}
                                                         whileTap={{ scale: 0.98 }}
                                                         onClick={toggleTaskStatus}
-                                                        className="flex-1 rounded-lg bg-blue-600 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 transition-colors"
+                                                        className="flex-1 rounded-lg bg-blue-600 dark:bg-blue-500 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
                                                     >
                                                         {formData.status === 'done' ? 'Mark as Todo' : 'Mark as Done'}
                                                     </motion.button>
@@ -680,7 +680,7 @@ export default function TaskDetailModal({
                                                         whileHover={{ scale: 1.02 }}
                                                         whileTap={{ scale: 0.98 }}
                                                         onClick={handleDeleteTask}
-                                                        className="rounded-lg bg-red-600 dark:bg-red-500 px-6 py-3 text-base font-medium text-white hover:bg-red-700 dark:hover:bg-red-600 transition-colors"
+                                                        className="rounded-lg bg-gray-200 dark:bg-slate-700 px-6 py-3 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
                                                     >
                                                         <Trash size={18} />
                                                     </motion.button>
