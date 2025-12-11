@@ -24,22 +24,22 @@ export default function CalendarDay({ day, onAddTask, onTaskClick, activeTaskDat
     });
 
     const getDropZoneStyle = () => {
-        if (!day.is_in_period) return 'bg-gray-50 dark:bg-gray-800/50';
+        if (!day.is_in_period) return 'bg-gray-50 dark:bg-gray-900/70';
 
-        if (isSameDate && isOver) return 'bg-red-50 dark:bg-red-900/40 ring-2 ring-red-400 dark:ring-red-500';
+        if (isSameDate && isOver) return 'bg-red-50 dark:bg-red-950/60 ring-2 ring-red-400 dark:ring-red-500';
 
-        if (isSameDate) return 'bg-gray-50 dark:bg-gray-800 opacity-50';
+        if (isSameDate) return 'bg-gray-100 dark:bg-gray-900/80 opacity-50';
 
-        if (isOver) return 'ring-2 ring-green-400 dark:ring-green-500 bg-green-50 dark:bg-green-900/40';
+        if (isOver) return 'ring-2 ring-green-400 dark:ring-green-500 bg-green-50 dark:bg-green-950/50';
 
-        if (isWeekend) return 'bg-blue-50/50 dark:bg-blue-950/20 hover:bg-blue-100/60 dark:hover:bg-blue-950/30';
+        if (isWeekend) return 'bg-blue-50/50 dark:bg-slate-800/80 hover:bg-blue-100/60 dark:hover:bg-slate-700/90';
 
-        return 'bg-white dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-800/70';
+        return 'bg-white dark:bg-slate-800/60 hover:bg-gray-50 dark:hover:bg-slate-700/70';
     };
 
     const getDayNumberColor = () => {
         if (day.is_today) return 'text-blue-600 dark:text-blue-400 font-bold';
-        if (isWeekend) return 'text-blue-600 dark:text-blue-400';
+        if (isWeekend) return 'text-blue-600 dark:text-sky-400';
         return 'text-gray-900 dark:text-gray-100';
     };
 
@@ -50,10 +50,10 @@ export default function CalendarDay({ day, onAddTask, onTaskClick, activeTaskDat
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2 }}
             className={`min-h-32 border p-2 ${getDropZoneStyle()} ${day.is_today
-                ? 'border-2 border-blue-500 dark:border-blue-400 shadow-md dark:shadow-blue-900/20'
-                : isWeekend
-                    ? 'border-blue-200 dark:border-blue-900/40'
-                    : 'border-gray-200 dark:border-gray-700'
+                    ? 'border-2 border-blue-500 dark:border-blue-400 shadow-md dark:shadow-blue-500/20'
+                    : isWeekend
+                        ? 'border-blue-200 dark:border-slate-700'
+                        : 'border-gray-200 dark:border-slate-700'
                 } transition-all duration-200 cursor-default relative`}
         >
             {/* Indicator untuk invalid drop */}
@@ -89,12 +89,12 @@ export default function CalendarDay({ day, onAddTask, onTaskClick, activeTaskDat
                         <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            className="rounded-full bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 text-[10px] font-bold"
+                            className="rounded-full bg-gray-100 dark:bg-slate-700/80 px-1.5 py-0.5 text-[10px] font-bold"
                         >
                             <span className="text-green-600 dark:text-green-400">
                                 {day.completed_count}
                             </span>
-                            <span className="text-gray-500 dark:text-gray-400">
+                            <span className="text-gray-500 dark:text-gray-300">
                                 /{day.tasks_count}
                             </span>
                         </motion.div>
@@ -104,7 +104,7 @@ export default function CalendarDay({ day, onAddTask, onTaskClick, activeTaskDat
                             whileHover={{ scale: 1.15, rotate: 90 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => onAddTask(day.date)}
-                            className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-all"
+                            className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-all"
                             title="Add task"
                         >
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
@@ -134,7 +134,7 @@ export default function CalendarDay({ day, onAddTask, onTaskClick, activeTaskDat
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="px-2 py-1 text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded text-center"
+                            className="px-2 py-1 text-[10px] font-medium text-gray-500 dark:text-gray-300 bg-gray-100 dark:bg-slate-700/70 rounded text-center"
                         >
                             +{day.tasks!.length - 4} more tasks
                         </motion.div>

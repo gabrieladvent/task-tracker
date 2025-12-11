@@ -24,7 +24,7 @@ export default function Index({ periods }: Props) {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setIsModalOpen(true)}
-                        className="rounded-md mb-5 bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors justify-end"
+                        className="rounded-md mb-5 bg-gray-800 dark:bg-gray-100 dark:text-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors justify-end"
                     >
                         New Period
                     </motion.button>

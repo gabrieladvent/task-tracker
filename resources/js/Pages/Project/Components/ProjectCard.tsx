@@ -2,7 +2,6 @@ import { Project } from '@/Pages/Project/types/Project';
 import { motion } from 'framer-motion';
 import { Edit2, Eye, Folder } from 'lucide-react';
 
-
 interface Props {
     project: Project;
     index: number;
@@ -41,6 +40,9 @@ export default function ProjectCard({ project, index, onEdit, onView }: Props) {
                             <h3 className="text-lg font-semibold text-gray-900">
                                 {project.name}
                             </h3>
+                            <p className="text-xs text-gray-500 mt-1">
+                                Created {project.created_at}
+                            </p>
                         </div>
                     </div>
                 </div>

@@ -9,13 +9,13 @@ export default function DashboardCard({
     isComingSoon = false,
 }: DashboardCardProps) {
     const cardContent = (
-        <div className="p-6">
+        <div className="p-6 dark:bg-gray-800">
             <div className="flex items-center justify-between">
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                         {title}
                     </h3>
-                    <p className="mt-1 text-sm text-gray-600">
+                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-100">
                         {description}
                     </p>
                 </div>

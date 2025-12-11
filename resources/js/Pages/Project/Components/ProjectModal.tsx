@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import ProjectForm from '@/Pages/Project/Components/ProjectForm';
 import ProjectDetail from '@/Pages/Project/Components/ProjectDetail';
-import { Project } from '@/Pages/Periods/types/period';
+import { Project } from '@/Pages/Project/types/Project'
 
 interface Props {
     isOpen: boolean;
