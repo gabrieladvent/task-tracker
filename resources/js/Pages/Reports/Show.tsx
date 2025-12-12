@@ -35,23 +35,23 @@ export default function ReportsShow({ period, report }: Props) {
 
     const getStatusColor = (status: string) => {
         const colors: Record<string, string> = {
-            done: 'bg-green-100 text-green-800',
-            in_progress: 'bg-blue-100 text-blue-800',
-            todo: 'bg-gray-100 text-gray-800',
-            on_hold: 'bg-yellow-100 text-yellow-800',
-            cancelled: 'bg-red-100 text-red-800',
-            code_review: 'bg-purple-100 text-purple-800',
+            done: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+            in_progress: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+            todo: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+            on_hold: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+            cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+            code_review: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
         };
-        return colors[status] || 'bg-gray-100 text-gray-800';
+        return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
     };
 
     const getPriorityColor = (priority: string) => {
         const colors: Record<string, string> = {
-            high: 'bg-red-100 text-red-800',
-            medium: 'bg-yellow-100 text-yellow-800',
-            low: 'bg-gray-100 text-gray-800',
+            high: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+            medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+            low: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
         };
-        return colors[priority] || 'bg-gray-100 text-gray-800';
+        return colors[priority] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
     };
 
     return (
@@ -68,19 +68,19 @@ export default function ReportsShow({ period, report }: Props) {
                     >
                         <div className="flex items-center justify-between mb-4">
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900">
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                                     {report.report_name}
                                 </h2>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
                                     Period: {period.name} ({period.start_date} - {period.end_date})
                                 </p>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-gray-500 dark:text-gray-500">
                                     Generated: {report.created_at}
                                 </p>
                             </div>
                             <Link
                                 href={`/periods/${period.id}/reports`}
-                                className="text-blue-600 hover:text-blue-800"
+                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                             >
                                 ← Back to Reports
                             </Link>
@@ -98,7 +98,7 @@ export default function ReportsShow({ period, report }: Props) {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleExport}
-                                className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                                className="flex items-center gap-2 bg-green-600 dark:bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
                             >
                                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -109,7 +109,7 @@ export default function ReportsShow({ period, report }: Props) {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setShowDeleteModal(true)}
-                                className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                                className="flex items-center gap-2 bg-red-600 dark:bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700 dark:hover:bg-red-600 transition-colors"
                             >
                                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

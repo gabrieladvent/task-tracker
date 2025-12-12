@@ -11,10 +11,10 @@ export default function ReportEmptyState({ hasSearch, periodId }: ReportEmptySta
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-white rounded-lg shadow-sm p-12 text-center"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center"
         >
             <svg
-                className="mx-auto h-12 w-12 text-gray-400"
+                className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -26,7 +26,7 @@ export default function ReportEmptyState({ hasSearch, periodId }: ReportEmptySta
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
             </svg>
-            <p className="mt-4 text-gray-500">
+            <p className="mt-4 text-gray-500 dark:text-gray-400">
                 {hasSearch
                     ? 'No reports found matching your search.'
                     : periodId
@@ -36,7 +36,7 @@ export default function ReportEmptyState({ hasSearch, periodId }: ReportEmptySta
             {!hasSearch && periodId && (
                 <Link
                     href={`/periods/${periodId}`}
-                    className="mt-4 inline-block text-blue-600 hover:text-blue-800"
+                    className="mt-4 inline-block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                     Go to Period →
                 </Link>
