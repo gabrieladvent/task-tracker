@@ -11,13 +11,18 @@ class TechDevTaskController extends Controller
 {
     public function index(Request $request)
     {
-        $perPage = $request->input('per_page', 12);
-        $search = $request->input('search', '');
+        $perPage = (int) $request->integer('per_page', 12);
+
+        $perPage = max(1, min($perPage, 100));
+
+        $search = trim((string) $request->input('search', ''));
 
         $tasks = TechDevTask::with('project')
             ->when($search, function ($query, $search) {
-                $query->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('title', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
             })
             ->latest()
             ->paginate($perPage)
@@ -76,12 +81,6 @@ class TechDevTaskController extends Controller
             'priority' => 'nullable|in:low,medium,high',
             'story_points' => 'nullable|integer|min:0|max:100',
         ]);
-
-        // protected $fillable = [
-        //     'name',
-        //     'start_date',
-        //     'end_date',
-        // ];
 
         $period = \App\Models\Period::current()->first();
 

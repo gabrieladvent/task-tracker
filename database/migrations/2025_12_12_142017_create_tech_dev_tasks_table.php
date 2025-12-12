@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignUuid('project_id')->nullable()->constrained('projects')->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
-            $table->text('notes')->nullable()->comment('This for note or sub task');
+            $table->text('notes')->nullable()->comment('Notes or sub-tasks');
             $table->timestamps();
         });
     }

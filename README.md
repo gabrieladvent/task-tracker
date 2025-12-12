@@ -7,7 +7,7 @@
 ![React TS](https://img.shields.io/badge/React-Typescript-3178C6?logo=react&logoColor=white)
 
 
-## Overviews
+## Overview
 Task Tracker is a modern and structured work-management application designed for developers and teams to organize their workflow with clarity and efficiency. It helps you manage periods (sprints/months), organize projects, track tasks with priorities and story points, and generate comprehensive reports — all powered by a clean integration of Laravel 12, Inertia.js, React TypeScript, and Tailwind CSS.
 
 This application is optimized for real-world daily usage: tracking progress, carrying over unfinished tasks, and providing insights that improve productivity over time.
@@ -132,9 +132,9 @@ php artisan task:copy-incomplete --date=2025-12-12 --from-date=2025-12-11
 
 Both `--date` and `--from-date` are **optional**:
 
-`--from-date`	Source date of the incomplete tasks. If omitted, the command automatically uses yesterday.
+`--from-date`  Source date of the incomplete tasks. If omitted, the command automatically uses yesterday.
 
-`--date`	Destination date where tasks will be copied. If omitted, the command automatically uses tomorrow.
+`--date` Destination date where tasks will be copied. If omitted, the command automatically uses tomorrow.
 
 ### Default Behavior
 
@@ -167,7 +167,7 @@ php artisan optimize
 
 ## Project Structure
 
-```
+```text
 ├── app/
 │   ├── Http/Controllers/    # Laravel controllers
 │   ├── Models/              # Eloquent models
