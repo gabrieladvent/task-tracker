@@ -1,4 +1,4 @@
-name: LMS GH Action
+name: Task Tracker GH Action
 
 on:
   pull_request:
