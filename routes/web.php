@@ -5,6 +5,7 @@ use App\Http\Controllers\PeriodReportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TechDevTaskController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -52,6 +53,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/{report}', [PeriodReportController::class, 'show'])->name('periods.reports.show');
         Route::get('/{report}/export', [PeriodReportController::class, 'export'])->name('periods.reports.export');
         Route::delete('/{report}', [PeriodReportController::class, 'destroy'])->name('periods.reports.destroy');
+    });
+
+    Route::prefix('tech-dev')->name('tech-dev.')->group(function () {
+        Route::get('/', [TechDevTaskController::class, 'index'])->name('index');
+        Route::post('/', [TechDevTaskController::class, 'store'])->name('store');
+        Route::put('/{techDevTask}', [TechDevTaskController::class, 'update'])->name('update');
+        Route::delete('/{techDevTask}', [TechDevTaskController::class, 'destroy'])->name('destroy');
+        Route::post('/{techDevTask}/move-to-task', [TechDevTaskController::class, 'moveToTask'])->name('move-to-task');
     });
 });
 
