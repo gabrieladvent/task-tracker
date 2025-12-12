@@ -34,3 +34,8 @@ fi
 
 # echo "✅ Branch name valid, running Pest tests..."
 # ./vendor/bin/pest --parallel
+
+echo "Running build..."
+npm run build
+
+echo "Done!"
