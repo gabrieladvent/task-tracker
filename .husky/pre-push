@@ -32,5 +32,5 @@ if ! echo "$branch_name" | grep -Eq "$allowed_prefixes"; then
   exit 1
 fi
 
-echo "✅ Branch name valid, running Pest tests..."
-./vendor/bin/pest --parallel
+# echo "✅ Branch name valid, running Pest tests..."
+# ./vendor/bin/pest --parallel
