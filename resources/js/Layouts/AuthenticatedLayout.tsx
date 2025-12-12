@@ -91,6 +91,15 @@ export default function Authenticated({
                                         Reports
                                     </NavLink>
                                 </motion.div>
+
+                                <motion.div whileHover={{ scale: 1.05 }}>
+                                    <NavLink
+                                        href={route('tech-dev.index')}
+                                        active={route().current('tech-dev.*')}
+                                    >
+                                        Tech Dev
+                                    </NavLink>
+                                </motion.div>
                             </div>
                         </div>
 
