@@ -1,0 +1,36 @@
+#!/usr/bin/env sh
+
+# Get the current branch name
+branch_name=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD)
+
+# Check if in detached HEAD state
+if [ "$branch_name" = "HEAD" ]; then
+  echo "Error: You are in 'detached HEAD' state. Please checkout a branch before pushing."
+  exit 1
+fi
+
+# Define allowed prefixes
+allowed_prefixes="^(feat|fix|docs|style|refactor|test|chore)\/"
+
+# Check if the branch name matches the allowed prefixes
+if ! echo "$branch_name" | grep -Eq "$allowed_prefixes"; then
+  echo "Error: Branch name '$branch_name' is invalid."
+  echo "Branch names must follow this format:"
+  echo ""
+  echo "  feat: (new feature for the user, not a new feature for build script)"
+  echo "  fix: (bug fix for the user, not a fix to a build script)"
+  echo "  docs: (changes to the documentation)"
+  echo "  style: (formatting, missing semi colons, etc; no production code change)"
+  echo "  refactor: (refactoring production code, eg. renaming a variable)"
+  echo "  test: (adding missing tests, refactoring tests; no production code change)"
+  echo "  chore: (updating grunt tasks etc; no production code change)"
+  echo ""
+  echo "Example branch names:"
+  echo "  feat/add-login-page"
+  echo "  fix/navbar-issue"
+  echo "  docs/update-readme"
+  exit 1
+fi
+
+# echo "✅ Branch name valid, running Pest tests..."
+# ./vendor/bin/pest --parallel
