@@ -2,8 +2,3 @@
 
 echo "Running Pint..."
 ./vendor/bin/pint --dirty
-
-echo "Running build..."
-npm run build
-
-echo "Done!"
