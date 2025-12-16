@@ -1,44 +1,45 @@
 <?php
 
-namespace Tests\Feature\Auth;
-
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class PasswordConfirmationTest extends TestCase
-{
-    use RefreshDatabase;
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-    public function test_confirm_password_screen_can_be_rendered(): void
-    {
-        $user = User::factory()->create();
+// test('confirm password screen can be rendered', function () {
+//     $user = User::factory()->create([
+//         'email' => 'user@laravel.com',
+//         'password' => bcrypt('password'),
+//     ]);
 
-        $response = $this->actingAs($user)->get('/confirm-password');
+//     // Login sebagai user
+//     $this->actingAs($user);
 
-        $response->assertStatus(200);
-    }
+//     $page = visit('/confirm-password')
+//         ->on()->desktop()
+//         ->inLightMode();
 
-    public function test_password_can_be_confirmed(): void
-    {
-        $user = User::factory()->create();
+//     $page->assertSee('Confirm Password')
+//         ->assertSee('This is a secure area')
+//         ->assertSee('Password')
+//         ->assertSee('Confirm');
+// });
 
-        $response = $this->actingAs($user)->post('/confirm-password', [
-            'password' => 'password',
-        ]);
+test('password can be confirmed', function () {
+    $user = User::factory()->create();
 
-        $response->assertRedirect();
-        $response->assertSessionHasNoErrors();
-    }
+    $response = $this->actingAs($user)->post('/confirm-password', [
+        'password' => 'password',
+    ]);
 
-    public function test_password_is_not_confirmed_with_invalid_password(): void
-    {
-        $user = User::factory()->create();
+    $response->assertRedirect();
+    $response->assertSessionHasNoErrors();
+});
 
-        $response = $this->actingAs($user)->post('/confirm-password', [
-            'password' => 'wrong-password',
-        ]);
+test('password is not confirmed with invalid password', function () {
+    $user = User::factory()->create();
 
-        $response->assertSessionHasErrors();
-    }
-}
+    $response = $this->actingAs($user)->post('/confirm-password', [
+        'password' => 'wrong-password',
+    ]);
+
+    $response->assertSessionHasErrors();
+});

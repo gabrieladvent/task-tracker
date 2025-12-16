@@ -3,11 +3,11 @@
 commit_msg_file=$1
 commit_msg=$(cat "$commit_msg_file")
 
-allowed_prefixes="^(add|feat|fix|docs|style|refactor|test|chore|change|adjust|update):"
+allowed_prefixes="^(add|feat|fix|docs|style|refactor|test|chore|change|adjust|update|merge):|^Merge"
 
 if ! echo "$commit_msg" | grep -Eq "$allowed_prefixes"; then
   echo "❌ Commit message invalid!"
-  echo "Must start with one of: add: feat:, fix:, docs:, style:, refactor:, test:, chore:, change:, adjust:, update:"
+  echo "Must start with one of: add: feat:, fix:, docs:, style:, refactor:, test:, chore:, change:, adjust:, update:, Merge"
   echo "Example: feat: add user login"
   exit 1
 fi

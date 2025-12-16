@@ -1,0 +1,85 @@
+name: Notify
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+jobs:
+  telegram:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true || github.event.action != 'closed'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Wait for other workflows
+        uses: lewagon/wait-on-check-action@v1.3.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          running-workflow-name: 'telegram'  
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
+          allowed-conclusions: success,failure,cancelled,skipped
+
+      - name: Get workflow results
+        id: results
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: checkRuns } = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.payload.pull_request.head.sha
+            });
+
+            // Filter workflow yang relevan DAN exclude Notify
+            const workflows = checkRuns.check_runs.filter(run =>
+              ['Test', 'Lint', 'Build'].some(name => run.name.includes(name)) &&
+              !run.name.includes('telegram') &&
+              !run.name.includes('Notify')
+            );
+
+            const allSuccess = workflows.every(w => w.conclusion === 'success');
+            const anyFailure = workflows.some(w => w.conclusion === 'failure');
+
+            let conclusion = 'success';
+            let emoji = '✅';
+
+            if (anyFailure) {
+              conclusion = 'failure';
+              emoji = '❌';
+            } else if (!allSuccess) {
+              conclusion = 'pending';
+              emoji = '🔄';
+            }
+
+            core.setOutput('conclusion', conclusion);
+            core.setOutput('emoji', emoji);
+            core.setOutput('count', workflows.length);
+
+      - name: Set PR status
+        id: pr_status
+        run: |
+          if [ "${{ github.event.pull_request.merged }}" == "true" ]; then
+            echo "action=merged" >> $GITHUB_OUTPUT
+          else
+            echo "action=${{ github.event.action }}" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ${{ steps.results.outputs.emoji }} **PR #${{ github.event.pull_request.number }}** - ${{ steps.pr_status.outputs.action }}
+
+            **Title:** ${{ github.event.pull_request.title }}
+            **Status:** `${{ steps.results.outputs.conclusion }}`
+            **Checks:** ${{ steps.results.outputs.count }} workflows completed
+            **Repository:** `${{ github.repository }}`
+            **Branch:** `${{ github.event.pull_request.head.ref }}` → `${{ github.event.pull_request.base.ref }}`
+            **Author:** @${{ github.event.pull_request.user.login }}
+
+            [View PR](${{ github.event.pull_request.html_url }})
