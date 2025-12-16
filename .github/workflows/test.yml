@@ -11,8 +11,13 @@ permissions:
 
 jobs:
   unit-tests:
-    name: Unit & Feature Tests
+    name: Unit & Feature Tests (Shard ${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
 
     services:
       mysql:
@@ -65,7 +70,7 @@ jobs:
           DB_PASSWORD: password
 
       - name: Run unit & feature tests
-        run: ./vendor/bin/pest --exclude-group=browser --parallel --ci
+        run: ./vendor/bin/pest --exclude-group=browser --parallel --shard=${{ matrix.shard }}/4 --ci
         env:
           DB_CONNECTION: mysql
           DB_HOST: 127.0.0.1
@@ -75,8 +80,13 @@ jobs:
           DB_PASSWORD: password
 
   browser-tests:
-    name: Browser Tests
+    name: Browser Tests (Shard ${{ matrix.shard }}/2)
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
 
     services:
       mysql:
@@ -134,13 +144,8 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
+      - name: Install Playwright for Pest Browser Plugin
         run: npx playwright install --with-deps
-
-      - name: Install Playwright deps only
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps
 
       - name: Build assets
         run: npm run build
@@ -161,33 +166,8 @@ jobs:
           DB_USERNAME: root
           DB_PASSWORD: password
 
-      - name: Start Laravel server
-        run: php artisan serve --host=0.0.0.0 --port=8000 &
-        env:
-          DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: laravel_testing
-          DB_USERNAME: root
-          DB_PASSWORD: password
-          APP_URL: http://localhost:8000
-
-      - name: Wait for server
-        run: |
-          echo "Waiting for Laravel server..."
-          for i in {1..30}; do
-            if curl -f http://localhost:8000 > /dev/null 2>&1; then
-              echo "Server is ready!"
-              exit 0
-            fi
-            echo "Attempt $i/30: Server not ready yet..."
-            sleep 2
-          done
-          echo "Server failed to start"
-          exit 1
-
       - name: Run browser tests
-        run: ./vendor/bin/pest --group=browser --ci
+        run: ./vendor/bin/pest --group=browser --parallel --shard=${{ matrix.shard }}/2 --ci
         env:
           DB_CONNECTION: mysql
           DB_HOST: 127.0.0.1
@@ -201,16 +181,16 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: browser-test-screenshots-${{ github.run_id }}
-          path: tests/Browser/Screenshots/
+          name: browser-screenshots-shard-${{ matrix.shard }}-${{ github.run_id }}
+          path: tests/Browser/screenshots/
           retention-days: 7
           if-no-files-found: ignore
 
-      - name: Upload console logs on failure
+      - name: Upload browser logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: browser-console-logs-${{ github.run_id }}
-          path: tests/Browser/console/
+          name: browser-logs-shard-${{ matrix.shard }}-${{ github.run_id }}
+          path: storage/logs/
           retention-days: 7
           if-no-files-found: ignore

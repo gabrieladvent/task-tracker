@@ -8,7 +8,7 @@ on:
 
 jobs:
   telegram:
-    if: github.event.workflow_run.conclusion != 'skipped'
+    if: always() && github.event.workflow_run.conclusion != 'skipped'
     runs-on: ubuntu-latest
 
     steps:
