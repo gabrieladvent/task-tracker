@@ -48,6 +48,7 @@
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.555.0",
+    "playwright": "^1.57.0",
     "react-date-range": "^2.0.1",
     "react-hot-toast": "^2.6.0",
     "tailwind-merge": "^3.4.0"
