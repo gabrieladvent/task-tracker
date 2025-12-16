@@ -19,7 +19,7 @@ test('login screen can be rendered', function () {
         ->type('email', 'nuno@laravel.com')
         ->type('password', 'password')
         ->click('button:has-text("LOG IN")')
-        ->assertPathIs('/dashboard') 
+        ->assertPathIs('/dashboard')
         ->assertSee('Dashboard');
 });
 

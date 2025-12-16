@@ -8,15 +8,35 @@ on:
 
 jobs:
   telegram:
-    if: always()
+    if: github.event.workflow_run.conclusion != 'skipped'
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set status emoji
+        id: emoji
+        run: |
+          if [ "${{ github.event.workflow_run.conclusion }}" == "success" ]; then
+            echo "emoji=✅" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.workflow_run.conclusion }}" == "failure" ]; then
+            echo "emoji=❌" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.workflow_run.conclusion }}" == "cancelled" ]; then
+            echo "emoji=⚠️" >> $GITHUB_OUTPUT
+          else
+            echo "emoji=❓" >> $GITHUB_OUTPUT
+          fi
+
       - uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
           message: |
-            Workflow *${{ github.event.workflow_run.name }}*
-            Status: *${{ github.event.workflow_run.conclusion }}*
-            Repo: ${{ github.repository }}
+            ${{ steps.emoji.outputs.emoji }} **${{ github.event.workflow_run.name }}** workflow completed
+
+            **Status:** `${{ github.event.workflow_run.conclusion }}`
+            **Repository:** `${{ github.repository }}`
+            **Branch:** `${{ github.event.workflow_run.head_branch }}`
+            **Commit:** `${{ github.event.workflow_run.head_sha }}`
+            **Actor:** @${{ github.event.workflow_run.actor.login }}
+
+            [View Run](${{ github.event.workflow_run.html_url }})
