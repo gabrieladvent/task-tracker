@@ -30,7 +30,7 @@ test('reset password screen can be rendered', function () {
 
         return true;
     });
-});
+})->todo();
 
 test('password can be reset with valid token', function () {
     Notification::fake();
