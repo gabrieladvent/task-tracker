@@ -1,54 +1,56 @@
 <?php
 
-namespace Tests\Feature\Auth;
-
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class AuthenticationTest extends TestCase
-{
-    use RefreshDatabase;
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-    public function test_login_screen_can_be_rendered(): void
-    {
-        $response = $this->get('/login');
+test('login screen can be rendered', function () {
+    // Buat user terlebih dahulu
+    $user = User::factory()->create([
+        'email' => 'nuno@laravel.com',
+        'password' => bcrypt('password'),
+    ]);
 
-        $response->assertStatus(200);
-    }
+    $page = visit('/login')
+        ->on()->desktop()
+        ->inLightMode();
 
-    public function test_users_can_authenticate_using_the_login_screen(): void
-    {
-        $user = User::factory()->create();
+    $page->assertSee('Email')
+        ->type('email', 'nuno@laravel.com')
+        ->type('password', 'password')
+        ->click('button:has-text("LOG IN")')
+        ->assertPathIs('/dashboard') 
+        ->assertSee('Dashboard');
+});
 
-        $response = $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'password',
-        ]);
+test('users can authenticate using the login screen', function () {
+    $user = User::factory()->create();
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
-    }
+    $response = $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
 
-    public function test_users_can_not_authenticate_with_invalid_password(): void
-    {
-        $user = User::factory()->create();
+    $this->assertAuthenticated();
+    $response->assertRedirect(route('dashboard', absolute: false));
+});
 
-        $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'wrong-password',
-        ]);
+test('users can not authenticate with invalid password', function () {
+    $user = User::factory()->create();
 
-        $this->assertGuest();
-    }
+    $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'wrong-password',
+    ]);
 
-    public function test_users_can_logout(): void
-    {
-        $user = User::factory()->create();
+    $this->assertGuest();
+});
 
-        $response = $this->actingAs($user)->post('/logout');
+test('users can logout', function () {
+    $user = User::factory()->create();
 
-        $this->assertGuest();
-        $response->assertRedirect('/');
-    }
-}
+    $response = $this->actingAs($user)->post('/logout');
+
+    $this->assertGuest();
+    $response->assertRedirect('/');
+});
