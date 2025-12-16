@@ -6,17 +6,6 @@ use Illuminate\Support\Facades\Notification;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-test('reset password link screen can be rendered', function () {
-    $page = visit('/forgot-password')
-        ->on()->desktop()
-        ->inLightMode();
-
-    $page->assertSee('Forgot your password?')
-        ->assertSee('Forgot your password')
-        ->assertSee('Email')
-        ->assertSee('Email Password Reset Link');
-});
-
 test('reset password link can be requested', function () {
     Notification::fake();
 

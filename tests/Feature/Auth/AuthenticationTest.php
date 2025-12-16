@@ -4,25 +4,6 @@ use App\Models\User;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-test('login screen can be rendered', function () {
-    // Buat user terlebih dahulu
-    $user = User::factory()->create([
-        'email' => 'nuno@laravel.com',
-        'password' => bcrypt('password'),
-    ]);
-
-    $page = visit('/login')
-        ->on()->desktop()
-        ->inLightMode();
-
-    $page->assertSee('Email')
-        ->type('email', 'nuno@laravel.com')
-        ->type('password', 'password')
-        ->click('button:has-text("LOG IN")')
-        ->assertPathIs('/dashboard')
-        ->assertSee('Dashboard');
-});
-
 test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
 

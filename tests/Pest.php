@@ -11,9 +11,15 @@
 |
 */
 
+// Extend TestCase untuk Feature folder
 pest()->extend(Tests\TestCase::class)
- // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');
+
+// Extend TestCase untuk Browser folder dengan auto group
+pest()->extend(Tests\TestCase::class)
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->in('Browser')
+    ->group('browser');
 
 /*
 |--------------------------------------------------------------------------
