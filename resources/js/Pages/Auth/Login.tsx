@@ -47,7 +47,7 @@ export default function Login({
                         Welcome Back
                     </h1>
                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        Sign in to your account to continue
+                        Log in to your account to continue
                     </p>
                 </div>
 
@@ -193,7 +193,7 @@ export default function Login({
                             )}
                             <LogIn className="h-4 w-4 mr-2" />
                             <span className="relative">
-                                {processing ? 'Signing in...' : 'Sign In'}
+                                {processing ? 'Log in...' : 'Log In'}
                             </span>
                         </PrimaryButton>
                     </motion.div>
