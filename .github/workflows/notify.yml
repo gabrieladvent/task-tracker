@@ -7,7 +7,6 @@ on:
 jobs:
   telegram:
     runs-on: ubuntu-latest
-    # Hanya jalan jika PR merged atau ada update
     if: github.event.pull_request.merged == true || github.event.action != 'closed'
 
     steps:
@@ -18,9 +17,10 @@ jobs:
         uses: lewagon/wait-on-check-action@v1.3.1
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-          running-workflow-name: 'Notify'
+          running-workflow-name: 'telegram'  
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 10
+          allowed-conclusions: success,failure,cancelled,skipped
 
       - name: Get workflow results
         id: results
@@ -33,8 +33,11 @@ jobs:
               ref: context.payload.pull_request.head.sha
             });
 
+            // Filter workflow yang relevan DAN exclude Notify
             const workflows = checkRuns.check_runs.filter(run =>
-              ['Test', 'Lint', 'Build'].some(name => run.name.includes(name))
+              ['Test', 'Lint', 'Build'].some(name => run.name.includes(name)) &&
+              !run.name.includes('telegram') &&
+              !run.name.includes('Notify')
             );
 
             const allSuccess = workflows.every(w => w.conclusion === 'success');
