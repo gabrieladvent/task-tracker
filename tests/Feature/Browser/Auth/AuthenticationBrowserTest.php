@@ -13,7 +13,7 @@ test('login screen can be rendered', function () {
     $page->assertSee('Email')
         ->assertSee('Password')
         ->assertSee('Remember me')
-        ->assertSee('LOG IN');
+        ->assertSee('Welcome Back');
 });
 
 test('user can login successfully through browser', function () {
