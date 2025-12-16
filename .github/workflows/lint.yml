@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   pint:
-    name: Laravel Pint
+    name: Lint
     runs-on: ubuntu-latest
 
     steps:
