@@ -1,0 +1,22 @@
+name: Notify
+
+on:
+  workflow_run:
+    workflows: ["Lint", "Build", "Test"]
+    types:
+      - completed
+
+jobs:
+  telegram:
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: |
+            Workflow *${{ github.event.workflow_run.name }}*
+            Status: *${{ github.event.workflow_run.conclusion }}*
+            Repo: ${{ github.repository }}
