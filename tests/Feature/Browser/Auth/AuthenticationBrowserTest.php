@@ -1,7 +1,5 @@
 <?php
 
-// tests/Browser/Auth/AuthenticationBrowserTest.php
-
 use App\Models\User;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class)
@@ -15,7 +13,7 @@ test('login screen can be rendered', function () {
     $page->assertSee('Email')
         ->assertSee('Password')
         ->assertSee('Remember me')
-        ->assertSee('LOG IN');
+        ->assertSee('Welcome Back');
 });
 
 test('user can login successfully through browser', function () {
@@ -37,32 +35,32 @@ test('user can login successfully through browser', function () {
         ->assertNoJavascriptErrors();
 });
 
-// test('validation errors are displayed on login form', function () {
-//     $page = visit('/login')
-//         ->on()->desktop()
-//         ->inLightMode();
+test('validation errors are displayed on login form', function () {
+    $page = visit('/login')
+        ->on()->desktop()
+        ->inLightMode();
 
-//     $page->press('LOG IN')
-//         ->assertSee('The email field is required')
-//         ->assertPathIs('/login');
-// });
+    $page->click('button:has-text("LOG IN")')
+        ->assertSee('The email field is required.')
+        ->assertPathIs('/login');
+});
 
-// test('invalid credentials show error message', function () {
-//     User::factory()->create([
-//         'email' => 'test@example.com',
-//         'password' => bcrypt('correctpassword'),
-//     ]);
+test('invalid credentials show error message', function () {
+    User::factory()->create([
+        'email' => 'test@example.com',
+        'password' => bcrypt('correctpassword'),
+    ]);
 
-//     $page = visit('/login')
-//         ->on()->desktop()
-//         ->inLightMode();
+    $page = visit('/login')
+        ->on()->desktop()
+        ->inLightMode();
 
-//     $page->type('email', 'test@example.com')
-//         ->type('password', 'wrongpassword')
-//         ->press('LOG IN')
-//         ->assertSee('These credentials do not match our records')
-//         ->assertPathIs('/login');
-// });
+    $page->type('email', 'test@example.com')
+        ->type('password', 'wrongpassword')
+        ->click('button:has-text("LOG IN")')
+        ->assertSee('These credentials do not match our records')
+        ->assertPathIs('/login');
+});
 
 test('user can logout through browser', function () {
     $user = User::factory()->create([
@@ -82,6 +80,6 @@ test('user can logout through browser', function () {
 
     $page->click('button:has-text("logout")')
         ->click('button:has-text("Log Out")')
-        ->assertPathIs('/')
+        ->assertPathIs('/login')
         ->assertNoJavascriptErrors();
 });
