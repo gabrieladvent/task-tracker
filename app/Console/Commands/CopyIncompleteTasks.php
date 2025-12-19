@@ -29,7 +29,7 @@ class CopyIncompleteTasks extends Command
         $this->info("Copying incomplete tasks from {$fromDate->format('Y-m-d')} to {$targetDate->format('Y-m-d')}");
 
         $incompleteTasks = Task::where('task_date', $fromDate->format('Y-m-d'))
-            ->whereNotIn('status', ['done', 'cancelled'])
+            ->whereNotIn('status', ['done', 'cancelled', 'on_hold'])
             ->get();
 
         if ($incompleteTasks->isEmpty()) {
