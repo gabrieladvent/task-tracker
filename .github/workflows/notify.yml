@@ -71,15 +71,15 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          format: markdown
+          format: html
           message: |
             ${{ steps.results.outputs.emoji }} PR #${{ github.event.pull_request.number }} - ${{ steps.pr_status.outputs.action }}
 
-            *Title:* ${{ github.event.pull_request.title }}
-            *Status:* ${{ steps.results.outputs.conclusion }}
-            *Checks:* ${{ steps.results.outputs.count }} workflows completed
-            *Repository:* ${{ github.repository }}
-            *Branch:* ${{ github.event.pull_request.head.ref }} → ${{ github.event.pull_request.base.ref }}
-            *Author:* @${{ github.event.pull_request.user.login }}
+            <b>Title:</b> ${{ github.event.pull_request.title }}
+            <b>Status:</b> ${{ steps.results.outputs.conclusion }}
+            <b>Checks:</b> ${{ steps.results.outputs.count }} workflows completed
+            <b>Repository:</b> ${{ github.repository }}
+            <b>Branch:</b> ${{ github.event.pull_request.head.ref }} → ${{ github.event.pull_request.base.ref }}
+            <b>Author:</b> @${{ github.event.pull_request.user.login }}
 
-            [View PR](${{ github.event.pull_request.html_url }})
+            <a href="${{ github.event.pull_request.html_url }}">View PR</a>
