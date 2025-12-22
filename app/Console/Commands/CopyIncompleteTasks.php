@@ -1,9 +1,8 @@
 <?php
 
-// app/Console/Commands/CopyIncompleteTasks.php
-
 namespace App\Console\Commands;
 
+use App\Models\Period;
 use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -14,7 +13,7 @@ class CopyIncompleteTasks extends Command
                             {--date= : The date to copy tasks to (default: today)}
                             {--from-date= : The date to copy tasks from (default: yesterday)}';
 
-    protected $description = 'Copy incomplete tasks from previous day to specified date';
+    protected $description = 'Copy incomplete tasks from previous day to specified date (supports cross-period copying)';
 
     public function handle()
     {
@@ -28,7 +27,19 @@ class CopyIncompleteTasks extends Command
 
         $this->info("Copying incomplete tasks from {$fromDate->format('Y-m-d')} to {$targetDate->format('Y-m-d')}");
 
-        $incompleteTasks = Task::where('task_date', $fromDate->format('Y-m-d'))
+        $targetPeriod = Period::whereDate('start_date', '<=', $targetDate)
+            ->whereDate('end_date', '>=', $targetDate)
+            ->first();
+
+        if (! $targetPeriod) {
+            $this->error("No period found for target date {$targetDate->format('Y-m-d')}");
+
+            return Command::FAILURE;
+        }
+
+        $this->info("Target period: {$targetPeriod->name} ({$targetPeriod->start_date} to {$targetPeriod->end_date})");
+
+        $incompleteTasks = Task::whereDate('task_date', $fromDate->format('Y-m-d'))
             ->whereNotIn('status', ['done', 'cancelled', 'on_hold'])
             ->get();
 
@@ -41,10 +52,9 @@ class CopyIncompleteTasks extends Command
         $copiedCount = 0;
 
         foreach ($incompleteTasks as $task) {
-            // Check if task already exists for target date
-            $existingTask = Task::where('task_date', $targetDate->format('Y-m-d'))
+            $existingTask = Task::whereDate('task_date', $targetDate->format('Y-m-d'))
                 ->where('title', $task->title)
-                ->where('period_id', $task->period_id)
+                ->where('period_id', $targetPeriod->id)
                 ->first();
 
             if ($existingTask) {
@@ -54,9 +64,9 @@ class CopyIncompleteTasks extends Command
             }
 
             Task::create([
-                'period_id' => $task->period_id,
+                'period_id' => $targetPeriod->id,
                 'project_id' => $task->project_id,
-                'task_date' => $targetDate,
+                'task_date' => $targetDate->format('Y-m-d'),
                 'title' => $task->title,
                 'description' => $task->description,
                 'status' => $task->status,
@@ -70,7 +80,7 @@ class CopyIncompleteTasks extends Command
             $this->info("Copied: {$task->title}");
         }
 
-        $this->info("Successfully copied {$copiedCount} task(s).");
+        $this->info("Successfully copied {$copiedCount} task(s) to period '{$targetPeriod->name}'.");
 
         return Command::SUCCESS;
     }
