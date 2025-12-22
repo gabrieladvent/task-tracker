@@ -27,7 +27,6 @@ class CopyIncompleteTasks extends Command
 
         $this->info("Copying incomplete tasks from {$fromDate->format('Y-m-d')} to {$targetDate->format('Y-m-d')}");
 
-        // Cari periode target berdasarkan tanggal target
         $targetPeriod = Period::whereDate('start_date', '<=', $targetDate)
             ->whereDate('end_date', '>=', $targetDate)
             ->first();
@@ -53,7 +52,6 @@ class CopyIncompleteTasks extends Command
         $copiedCount = 0;
 
         foreach ($incompleteTasks as $task) {
-            // Check if task already exists for target date
             $existingTask = Task::whereDate('task_date', $targetDate->format('Y-m-d'))
                 ->where('title', $task->title)
                 ->where('period_id', $targetPeriod->id)
