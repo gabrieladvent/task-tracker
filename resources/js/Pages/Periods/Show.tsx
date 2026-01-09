@@ -7,12 +7,14 @@ import ListView from '@/Pages/Periods/Components/ShowPeriod/ListView';
 import ViewToggle from '@/Pages/Periods/Components/ShowPeriod/ViewToggle';
 import TaskDetailModal from '@/Pages/Periods/Components/ShowPeriod/TaskDetailModal';
 import { motion } from 'framer-motion';
+import GenerateReportModal from '@/Pages/Periods/Components/ShowPeriod/GenerateReportModal';
 
 export default function ShowPeriod({ period, tasksByDate, calendarData }: Props) {
     const [view, setView] = useState<'calendar' | 'list'>('calendar');
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [selectedTask, setSelectedTask] = useState<CalendarTask | null>(null);
     const [isNewTask, setIsNewTask] = useState(false);
+    const [showGenerateModal, setShowGenerateModal] = useState(false);
 
     const openNewTaskModal = (date: string) => {
         const emptyTask: CalendarTask = {
@@ -63,7 +65,21 @@ export default function ShowPeriod({ period, tasksByDate, calendarData }: Props)
                     </p>
                 </motion.div>
 
-                <ViewToggle view={view} onViewChange={setView} />
+                <div className="flex justify-end gap-3">
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setShowGenerateModal(true)}
+                        className="flex items-center gap-2 rounded-lg bg-gray-800 dark:bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 dark:hover:bg-slate-600 transition-colors"
+                    >
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Generate Report
+                    </motion.button>
+
+                    <ViewToggle view={view} onViewChange={setView} />
+                </div>
             </div>
 
             <div className="w-full py-10">
@@ -97,6 +113,13 @@ export default function ShowPeriod({ period, tasksByDate, calendarData }: Props)
                 task={selectedTask}
                 periodId={period.id}
                 isNewTask={isNewTask}
+            />
+
+            <GenerateReportModal
+                isOpen={showGenerateModal}
+                onClose={() => setShowGenerateModal(false)}
+                periodId={period.id}
+                periodName={period.name}
             />
         </AuthenticatedLayout>
     );
