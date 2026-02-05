@@ -41,7 +41,7 @@ class TaskController extends Controller
             'task_date' => 'sometimes|required|date',
             'title' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
-            'status' => 'sometimes|in:todo,in_progress,on_hold,code_review,done,cancelled',
+            'status' => 'sometimes|in:todo,in_progress,on_hold,code_review,ready_qa,ready_dev,done,cancelled',
             'priority' => 'sometimes|in:low,medium,high',
             'story_points' => 'nullable|integer|min:0|max:100',
             'project_id' => 'nullable|exists:projects,id',
