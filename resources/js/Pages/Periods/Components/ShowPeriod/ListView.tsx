@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useMemo } from 'react';
 import { TasksByDate, CalendarTask } from '@/Pages/Periods/types/period';
-import { getStatusColor, getPriorityColor } from '@/Pages/Periods/utils';
+import { getStatusColor, getPriorityColor, getStatusLabel, getStatusBadgeColor } from '@/Pages/Periods/utils';
 
 interface ListViewProps {
     tasksByDate: TasksByDate[];
@@ -197,6 +197,15 @@ export default function ListView({ tasksByDate, onAddTask, onTaskClick }: ListVi
                                                     <div className="mt-2 flex items-center gap-2 text-xs">
                                                         <span className={`font-medium ${getPriorityColor(task.priority)} px-2 py-1 rounded-md bg-gray-100 dark:bg-slate-700/60`}>
                                                             {task.priority.toUpperCase()}
+                                                        </span>
+                                                        <div className="text-gray-400 dark:text-gray-500">
+                                                            <svg className="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                            </svg>
+                                                            {task.task_date}
+                                                        </div>
+                                                        <span className={`px-2 py-1 rounded-xl text-xs font-medium text-white ${getStatusColor(task.status)}`}>
+                                                            { getStatusLabel(task.status) }
                                                         </span>
                                                     </div>
                                                 </div>
