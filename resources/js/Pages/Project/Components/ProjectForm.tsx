@@ -116,6 +116,7 @@ export default function ProjectForm({ project, mode, onClose }: Props) {
                 </motion.button>
                 <motion.button
                     type="submit"
+                    onClick={handleSubmit}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     disabled={processing}
