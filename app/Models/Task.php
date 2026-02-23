@@ -16,6 +16,7 @@ class Task extends Model
 
     protected $fillable = [
         'period_id',
+        'parent_task_id',
         'project_id',
         'task_date',
         'title',
@@ -41,6 +42,21 @@ class Task extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function parentTask(): BelongsTo
+    {
+        return $this->belongsTo(Task::class, 'parent_task_id');
+    }
+
+    public function childTasks()
+    {
+        return $this->hasMany(Task::class, 'parent_task_id');
+    }
+
+    public function getOriginalTaskId(): string
+    {
+        return $this->parent_task_id ?? $this->id;
     }
 
     public function scopeDone($query)

@@ -66,6 +66,7 @@ class CopyIncompleteTasks extends Command
             Task::create([
                 'period_id' => $targetPeriod->id,
                 'project_id' => $task->project_id,
+                'parent_task_id' => $task->parent_task_id ?? $task->id,
                 'task_date' => $targetDate->format('Y-m-d'),
                 'title' => $task->title,
                 'description' => $task->description,

@@ -34,11 +34,17 @@ const parseEditorData = (notes: string): EditorData => {
     try {
         const parsed = JSON.parse(notes);
         if (parsed.blocks && Array.isArray(parsed.blocks)) {
+            parsed.blocks = parsed.blocks.filter((block: any) => {
+                if (block.type === 'paragraph') {
+                    return block.data && typeof block.data.text === 'string' && block.data.text.length > 0;
+                }
+                return block.data != null;
+            });
             return parsed;
         }
     } catch (error) {
         return {
-            blocks: [{ type: 'paragraph', data: { text: notes } }]
+            blocks: [{ type: 'paragraph', data: { text: String(notes) } }]
         };
     }
 
@@ -313,6 +319,10 @@ export default function TaskDetailModal({
             setSaveStatus('saving');
 
             const savedData = await editorRef.current.save();
+            // Filter block kosong/invalid sebelum simpan
+            savedData.blocks = savedData.blocks.filter(
+                (block) => !(block.type === 'paragraph' && !block.data?.text)
+            );
             const notesJson = JSON.stringify(savedData);
 
             await handleSaveField('notes', notesJson);
@@ -376,6 +386,7 @@ export default function TaskDetailModal({
 
         try {
             let notesJson = '';
+
             if (editorRef.current) {
                 const savedData = await editorRef.current.save();
                 notesJson = JSON.stringify(savedData);
@@ -384,17 +395,20 @@ export default function TaskDetailModal({
             router.post(`/periods/${periodId}/tasks`, {
                 task_date: formData.task_date,
                 title: formData.title,
-                description: formData.description,
+                description: formData.description || null,
                 status: formData.status,
                 priority: formData.priority,
                 story_points: formData.story_points ? parseInt(formData.story_points) : null,
                 project_id: formData.project_id || null,
-                notes: notesJson,
-                link_pull_request: formData.link_pull_request,
+                notes: notesJson || null,
+                link_pull_request: formData.link_pull_request || null,
             }, {
                 preserveScroll: true,
                 onSuccess: () => {
                     onClose();
+                },
+                onError: (errors) => {
+                    console.log('Validation errors:', errors);
                 }
             });
         } catch (error) {

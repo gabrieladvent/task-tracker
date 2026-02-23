@@ -10,22 +10,25 @@ class PeriodServices
 {
     public function getPeriodsWithStats(): Collection
     {
-        return Period::withCount([
-            'tasks',
-            'tasks as completed_tasks_count' => fn ($query) => $query->where('status', 'done'),
-        ])
+        return Period::with(['tasks:id,period_id,status,parent_task_id,task_date'])
             ->orderByDesc('start_date')
             ->get()
-            ->map(fn ($period) => [
-                'id' => $period->id,
-                'name' => $period->display_name,
-                'start_date' => $period->start_date->format('Y-m-d'),
-                'end_date' => $period->end_date->format('Y-m-d'),
-                'tasks_count' => $period->tasks_count,
-                'completed_tasks_count' => $period->completed_tasks_count,
-                'is_current' => $period->start_date->lte(Carbon::today()) &&
-                    $period->end_date->gte(Carbon::today()),
-            ]);
+            ->map(function ($period) {
+                $uniqueTasks = $period->tasks
+                    ->groupBy(fn ($task) => $task->parent_task_id ?? $task->id)
+                    ->map(fn ($versions) => $versions->sortByDesc('task_date')->first());
+
+                return [
+                    'id' => $period->id,
+                    'name' => $period->display_name,
+                    'start_date' => $period->start_date->format('Y-m-d'),
+                    'end_date' => $period->end_date->format('Y-m-d'),
+                    'tasks_count' => $uniqueTasks->count(),
+                    'completed_tasks_count' => $uniqueTasks->where('status.value', 'done')->count(),
+                    'is_current' => $period->start_date->lte(Carbon::today()) &&
+                        $period->end_date->gte(Carbon::today()),
+                ];
+            });
     }
 
     public function getPeriodDetails(Period $period): array
