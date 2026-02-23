@@ -52,6 +52,8 @@ class ReportService
             ->orderBy('created_at')
             ->get();
 
+        $tasks = $this->deduplicateTasks($tasks);
+
         $groupedByProject = $tasks->groupBy(function ($task) {
             return $task->project ? $task->project->name : 'No Project';
         });
@@ -60,11 +62,17 @@ class ReportService
 
         foreach ($groupedByProject as $projectName => $projectTasks) {
             $mergedTasks = $this->mergeRecurringTasks($projectTasks, $period);
-
             $reportData[$projectName] = $mergedTasks;
         }
 
         return $reportData;
+    }
+
+    protected function deduplicateTasks($tasks)
+    {
+        return $tasks->groupBy(fn ($task) => $task->getOriginalTaskId())
+            ->map(fn ($versions) => $versions->sortByDesc('task_date')->first())
+            ->values();
     }
 
     protected function mergeRecurringTasks($tasks, $period): array
