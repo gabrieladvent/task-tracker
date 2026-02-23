@@ -34,6 +34,28 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'badges' => $request->user() ? [
+                'periods' => cache()->remember(
+                    'badge_count_periods',
+                    now()->addMinutes(10),
+                    fn () => \App\Models\Period::count()
+                ),
+                'projects' => cache()->remember(
+                    'badge_count_projects',
+                    now()->addMinutes(10),
+                    fn () => \App\Models\Project::count()
+                ),
+                'reports' => cache()->remember(
+                    'badge_count_reports',
+                    now()->addMinutes(10),
+                    fn () => \App\Models\PeriodReport::count()
+                ),
+                'techDev' => cache()->remember(
+                    'badge_count_tech_dev',
+                    now()->addMinutes(10),
+                    fn () => \App\Models\TechDevTask::count()
+                ),
+            ] : [],
         ];
     }
 }
