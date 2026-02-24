@@ -26,13 +26,24 @@ class Task extends Model
         'priority',
         'story_points',
         'link_pull_request',
+        'status_changed_at',
     ];
 
     protected $casts = [
         'task_date' => 'date',
         'status' => StatusEnum::class,
         'priority' => PriorityEnum::class,
+        'status_changed_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::updating(function (Task $task) {
+            if ($task->isDirty('status')) {
+                $task->status_changed_at = now();
+            }
+        });
+    }
 
     public function period(): BelongsTo
     {

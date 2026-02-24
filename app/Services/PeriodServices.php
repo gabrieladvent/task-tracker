@@ -57,6 +57,24 @@ class PeriodServices
         ];
     }
 
+    private function resolveTaskFlags(object $task): array
+    {
+        $today = Carbon::today();
+
+        $createdToday = Carbon::parse($task->created_at)->isToday();
+
+        $isCarryOver = $task->parent_task_id !== null;
+
+        return [
+            'is_new_today' => $createdToday && ! $isCarryOver,
+
+            'is_carry_over' => $createdToday && $isCarryOver,
+
+            'is_status_changed_today' => $task->status_changed_at !== null
+                && Carbon::parse($task->status_changed_at)->isToday(),
+        ];
+    }
+
     private function getTasksGroupedByDate(Period $period): Collection
     {
         return $period->tasks()
@@ -70,7 +88,7 @@ class PeriodServices
                 'formatted_date' => Carbon::parse($date)->format('d M Y'),
                 'tasks' => $tasks
                     ->sortBy(fn ($task) => $task->status->sortOrder())
-                    ->map(fn ($task) => [
+                    ->map(fn ($task) => array_merge([
                         'id' => $task->id,
                         'title' => $task->title,
                         'description' => $task->description,
@@ -82,7 +100,7 @@ class PeriodServices
                         'project_id' => $task->project_id,
                         'project' => $task->project?->name,
                         'task_date' => $task->task_date->format('Y-m-d'),
-                    ])
+                    ], $this->resolveTaskFlags($task)))
                     ->values(),
             ])
             ->values();
@@ -125,7 +143,7 @@ class PeriodServices
     {
         $tasks = $period->tasks()
             ->with('project:id,name')
-            ->select(['id', 'title', 'status', 'priority', 'story_points', 'project_id', 'description', 'link_pull_request', 'notes', 'task_date', 'created_at'])
+            ->select(['id', 'title', 'status', 'priority', 'story_points', 'project_id', 'description', 'link_pull_request', 'notes', 'task_date', 'parent_task_id', 'created_at', 'status_changed_at'])
             ->orderBy('task_date')
             ->orderBy('created_at')
             ->get();
@@ -134,6 +152,7 @@ class PeriodServices
 
         $taskCounts = $tasksByDate->map(function ($dateTasks) {
             $completed = 0;
+
             foreach ($dateTasks as $task) {
                 if ($task->status->value === 'done') {
                     $completed++;
@@ -149,7 +168,7 @@ class PeriodServices
         $formattedTasks = $tasksByDate->map(function ($dateTasks) {
             return $dateTasks
                 ->sortBy(fn ($task) => $task->status->sortOrder())
-                ->map(fn ($task) => [
+                ->map(fn ($task) => array_merge([
                     'id' => $task->id,
                     'title' => $task->title,
                     'status' => $task->status->value,
@@ -161,7 +180,7 @@ class PeriodServices
                     'link_pull_request' => $task->link_pull_request,
                     'notes' => $task->notes,
                     'task_date' => $task->task_date->format('Y-m-d'),
-                ])
+                ], $this->resolveTaskFlags($task)))
                 ->values()
                 ->toArray();
         });
@@ -203,6 +222,7 @@ class PeriodServices
             if ($isInPeriod) {
                 if (isset($tasksData['counts'][$dateStr])) {
                     $dayData['tasks_count'] = $tasksData['counts'][$dateStr]['count'];
+
                     $dayData['completed_count'] = $tasksData['counts'][$dateStr]['completed'];
                 }
 
@@ -215,6 +235,7 @@ class PeriodServices
 
             if ($current->dayOfWeek === 6 || $current->eq($calendarEnd)) {
                 $weeks[] = $currentWeek;
+
                 $currentWeek = [];
             }
 

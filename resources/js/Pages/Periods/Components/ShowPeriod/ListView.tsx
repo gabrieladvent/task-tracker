@@ -1,12 +1,57 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useMemo } from 'react';
 import { TasksByDate, CalendarTask } from '@/Pages/Periods/types/period';
-import { getStatusColor, getPriorityColor, getStatusLabel, getStatusBadgeColor } from '@/Pages/Periods/utils';
+import { getStatusColor, getPriorityColor, getStatusLabel } from '@/Pages/Periods/utils';
 
 interface ListViewProps {
     tasksByDate: TasksByDate[];
     onAddTask: (date: string) => void;
     onTaskClick: (task: CalendarTask) => void;
+}
+
+function TaskActivityBadge({ task }: { task: any }) {
+    if (task.is_status_changed_today) {
+        return (
+            <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 dark:bg-blue-900/40 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-400 ring-1 ring-blue-200 dark:ring-blue-700">
+                <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Updated
+            </span>
+        );
+    }
+
+    if (task.is_new_today) {
+        return (
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-200 dark:ring-emerald-700">
+                <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                </span>
+                New
+            </span>
+        );
+    }
+
+    if (task.is_carry_over) {
+        return (
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-900/40 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400 ring-1 ring-amber-200 dark:ring-amber-700">
+                <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Carry-over
+            </span>
+        );
+    }
+
+    return null;
+}
+
+function taskBorderClass(task: any): string {
+    if (task.is_status_changed_today) return 'border-l-4 border-blue-500 dark:border-blue-400 bg-blue-50/30 dark:bg-blue-900/10 hover:bg-blue-50/60 dark:hover:bg-blue-900/20';
+    if (task.is_new_today) return 'border-l-4 border-emerald-500 dark:border-emerald-400 bg-emerald-50/30 dark:bg-emerald-900/10 hover:bg-emerald-50/60 dark:hover:bg-emerald-900/20';
+    if (task.is_carry_over) return 'border-l-4 border-amber-400 dark:border-amber-500 bg-amber-50/30 dark:bg-amber-900/10 hover:bg-amber-50/60 dark:hover:bg-amber-900/20';
+    return 'hover:bg-gray-50 dark:hover:bg-gray-700/50';
 }
 
 export default function ListView({ tasksByDate, onAddTask, onTaskClick }: ListViewProps) {
@@ -173,23 +218,24 @@ export default function ListView({ tasksByDate, onAddTask, onTaskClick }: ListVi
                                 className="overflow-hidden"
                             >
                                 <div className="divide-y divide-gray-200 dark:divide-slate-700">
-                                    {dateGroup.tasks.map((task, taskIndex) => (
+                                    {dateGroup.tasks.map((task: any, taskIndex: number) => (
                                         <motion.div
                                             key={task.id}
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: taskIndex * 0.05 }}
-                                            className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
+                                            className={`p-4 cursor-pointer transition-colors ${taskBorderClass(task)}`}
                                             onClick={() => onTaskClick(task as CalendarTask)}
                                         >
                                             <div className="flex items-start justify-between">
                                                 <div className="flex-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className={`h-2.5 w-2.5 rounded-full ${getStatusColor(task.status)} shadow-sm`} />
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <span className={`h-2.5 w-2.5 rounded-full ${getStatusColor(task.status)} shadow-sm flex-shrink-0`} />
                                                         <h4 className="font-medium text-gray-900 dark:text-gray-100">{task.title}</h4>
                                                         <span className="rounded-full bg-gray-100 dark:bg-slate-700/70 px-2 py-0.5 text-xs font-medium text-gray-600 dark:text-gray-200">
                                                             {task.story_points ?? 0} pts
                                                         </span>
+                                                        <TaskActivityBadge task={task} />
                                                     </div>
                                                     {task.project && (
                                                         <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{task.project}</p>
@@ -205,7 +251,7 @@ export default function ListView({ tasksByDate, onAddTask, onTaskClick }: ListVi
                                                             {task.task_date}
                                                         </div>
                                                         <span className={`px-2 py-1 rounded-xl text-xs font-medium text-white ${getStatusColor(task.status)}`}>
-                                                            { getStatusLabel(task.status) }
+                                                            {getStatusLabel(task.status)}
                                                         </span>
                                                     </div>
                                                 </div>
