@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enum\StatusEnum;
 use App\Models\Period;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -42,7 +43,71 @@ class PeriodServices
             'period' => $this->formatPeriodBasicInfo($period),
             'tasksByDate' => $this->getTasksGroupedByDate($period),
             'calendarData' => $this->generateCalendarData($period),
+            'boardData' => $this->getBoardData($period),
         ];
+    }
+
+    private function getBoardData(Period $period): array
+    {
+        $tasks = $period->tasks()
+            ->with('project:id,name')
+            ->select([
+                'id',
+                'title',
+                'description',
+                'status',
+                'priority',
+                'story_points',
+                'project_id',
+                'notes',
+                'link_pull_request',
+                'task_date',
+                'parent_task_id',
+                'created_at',
+                'status_changed_at',
+            ])
+            ->orderBy('task_date')
+            ->get();
+
+        $uniqueTasks = $tasks
+            ->groupBy(fn ($task) => $task->parent_task_id ?? $task->id)
+            ->map(fn ($versions) => $versions->sortByDesc('task_date')->first());
+
+        $tasksByStatus = $uniqueTasks->groupBy(fn ($task) => $task->status->value);
+
+        $statusOrder = collect(StatusEnum::cases())->sortBy(fn ($s) => $s->sortOrder());
+
+        $columns = $statusOrder->map(function (StatusEnum $statusEnum) use ($tasksByStatus) {
+            $statusValue = $statusEnum->value;
+            $statusTasks = $tasksByStatus->get($statusValue, collect());
+
+            return [
+                'status' => $statusValue,
+                'label' => $statusEnum->label(),
+                'color' => $statusEnum->color(),
+                'bg' => '',
+                'tasks' => $statusTasks->map(fn ($task) => array_merge(
+                    [
+                        'id' => (string) $task->id,
+                        'title' => $task->title,
+                        'description' => $task->description ?? '',
+                        'status' => $task->status->value,
+                        'priority' => $task->priority->value,
+                        'story_points' => $task->story_points,
+                        'project_id' => (string) ($task->project_id ?? ''),
+                        'project_name' => $task->project?->name,
+                        'project_color' => null,
+                        'notes' => $task->notes ?? '',
+                        'link_pull_request' => $task->link_pull_request ?? '',
+                        'task_date' => $task->task_date?->format('Y-m-d'),
+                        'project' => $task->project?->name,
+                    ],
+                    $this->resolveTaskFlags($task)
+                ))->values(),
+            ];
+        })->values();
+
+        return ['columns' => $columns];
     }
 
     private function formatPeriodBasicInfo(Period $period): array

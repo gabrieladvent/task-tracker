@@ -1,6 +1,5 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState, useEffect } from 'react';
@@ -15,9 +14,9 @@ function NavBadge({ count }: { count: number }) {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             className="ml-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px]
-                       px-1 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold
-                       leading-none dark:bg-indigo-900 dark:text-indigo-300 ring-1 ring-indigo-200
-                       dark:ring-indigo-700"
+                    px-1 rounded-full bg-gray-100 text-gray-700 text-[10px] font-bold
+                    leading-none dark:bg-gray-900 dark:text-gray-300 ring-1 ring-gray-200
+                    dark:ring-gray-700"
         >
             {count > 99 ? '99+' : count}
         </motion.span>
@@ -104,7 +103,7 @@ export default function Authenticated({
                                                 className={`relative inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium
                                                     transition-all duration-200 group
                                                     ${isActive
-                                                        ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50'
+                                                        ? 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-950/50'
                                                         : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'
                                                     }`}
                                             >
@@ -115,7 +114,7 @@ export default function Authenticated({
                                                 {isActive && (
                                                     <motion.span
                                                         layoutId="activeNavDot"
-                                                        className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-indigo-500"
+                                                        className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-gray-500"
                                                     />
                                                 )}
                                             </Link>
@@ -146,8 +145,8 @@ export default function Authenticated({
                                     >
                                         {/* Avatar */}
                                         <span className="flex items-center justify-center h-6 w-6 rounded-full
-                                                         bg-indigo-100 dark:bg-indigo-900 text-indigo-700
-                                                         dark:text-indigo-300 text-xs font-bold shrink-0">
+                                                         bg-gray-100 dark:bg-gray-900 text-gray-700
+                                                         dark:text-gray-300 text-xs font-bold shrink-0">
                                             {user.name.charAt(0).toUpperCase()}
                                         </span>
                                         <span className="max-w-[120px] truncate">{user.name}</span>
@@ -223,13 +222,13 @@ export default function Authenticated({
                                                 className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg
                                                     text-sm font-medium transition-all duration-200
                                                     ${isActive
-                                                        ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50'
+                                                        ? 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-950/50'
                                                         : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'
                                                     }`}
                                             >
                                                 <span className="flex items-center gap-2">
                                                     {isActive && (
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-gray-500 shrink-0" />
                                                     )}
                                                     {item.label}
                                                 </span>
@@ -246,8 +245,8 @@ export default function Authenticated({
                                 <div className="flex items-center gap-3 px-3 py-2.5 mb-2 rounded-lg
                                                 bg-gray-50 dark:bg-gray-800/50">
                                     <span className="flex items-center justify-center h-9 w-9 rounded-full
-                                                     bg-indigo-100 dark:bg-indigo-900 text-indigo-700
-                                                     dark:text-indigo-300 text-sm font-bold shrink-0">
+                                                     bg-gray-100 dark:bg-gray-900 text-gray-700
+                                                     dark:text-gray-300 text-sm font-bold shrink-0">
                                         {user.name.charAt(0).toUpperCase()}
                                     </span>
                                     <div className="min-w-0">
@@ -302,9 +301,9 @@ export default function Authenticated({
                         whileHover={{ scale: 1.1, y: -2 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={scrollToTop}
-                        className="fixed bottom-8 right-8 z-50 rounded-full bg-indigo-600 hover:bg-indigo-700
-                                   dark:bg-indigo-500 dark:hover:bg-indigo-600 p-3 text-white
-                                   shadow-lg shadow-indigo-500/30 dark:shadow-indigo-900/50 transition-colors"
+                        className="fixed bottom-8 right-8 z-50 rounded-full bg-gray-600 hover:bg-gray-700
+                                dark:bg-gray-500 dark:hover:bg-gray-600 p-3 text-white
+                                shadow-lg shadow-gray-500/30 dark:shadow-indigo-900/50 transition-colors"
                         aria-label="Scroll to top"
                     >
                         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

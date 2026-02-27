@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { Props, CalendarTask } from '@/Pages/Periods/types/period';
@@ -8,9 +8,10 @@ import ViewToggle from '@/Pages/Periods/Components/ShowPeriod/ViewToggle';
 import TaskDetailModal from '@/Pages/Periods/Components/ShowPeriod/TaskDetailModal';
 import { motion } from 'framer-motion';
 import GenerateReportModal from '@/Pages/Periods/Components/ShowPeriod/GenerateReportModal';
+import BoardKanban from './Components/ShowPeriod/BoardKanban';
 
-export default function ShowPeriod({ period, tasksByDate, calendarData }: Props) {
-    const [view, setView] = useState<'calendar' | 'list'>('calendar');
+export default function ShowPeriod({ period, tasksByDate, calendarData, boardData }: Props) {
+    const [view, setView] = useState<'calendar' | 'list' | 'board'>('calendar');
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [selectedTask, setSelectedTask] = useState<CalendarTask | null>(null);
     const [isNewTask, setIsNewTask] = useState(false);
@@ -52,7 +53,9 @@ export default function ShowPeriod({ period, tasksByDate, calendarData }: Props)
         <AuthenticatedLayout>
             <Head title={period.name} />
 
-            <div className="flex items-center justify-between px-10 mt-10">
+            {/* ── Header ── */}
+            <div className="px-10 mt-10 mb-6 space-y-3">
+                {/* Row 1: title + date */}
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -65,7 +68,8 @@ export default function ShowPeriod({ period, tasksByDate, calendarData }: Props)
                     </p>
                 </motion.div>
 
-                <div className="flex justify-end gap-3">
+                {/* Row 2: Generate Report (kiri) + ViewToggle (kanan) */}
+                <div className="flex items-center justify-between">
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -82,31 +86,35 @@ export default function ShowPeriod({ period, tasksByDate, calendarData }: Props)
                 </div>
             </div>
 
-            <div className="w-full py-10">
-                <div className="mx-auto w-full px-4 sm:px-6 lg:px-8">
-                    {/* Calendar View */}
-                    {view === 'calendar' && (
-                        <CalendarView
-                            calendarData={calendarData}
-                            onAddTask={openNewTaskModal}
-                            onTaskClick={openDetailModal}
-                            periodId={period.id}
-                            periodName={period.name}
-                        />
-                    )}
+            {/* ── Content ── */}
+            <div className="w-full px-4 sm:px-6 lg:px-8 pb-10">
+                {view === 'calendar' && (
+                    <CalendarView
+                        calendarData={calendarData}
+                        onAddTask={openNewTaskModal}
+                        onTaskClick={openDetailModal}
+                        periodId={period.id}
+                        periodName={period.name}
+                    />
+                )}
 
-                    {/* List View */}
-                    {view === 'list' && (
-                        <ListView
-                            tasksByDate={tasksByDate}
-                            onAddTask={openNewTaskModal}
-                            onTaskClick={openDetailModal}
-                        />
-                    )}
-                </div>
+                {view === 'list' && (
+                    <ListView
+                        tasksByDate={tasksByDate}
+                        onAddTask={openNewTaskModal}
+                        onTaskClick={openDetailModal}
+                    />
+                )}
+
+                {view === 'board' && (
+                    <BoardKanban
+                        boardData={boardData}
+                        onTaskClick={openDetailModal}
+                        onAddTask={openNewTaskModal}
+                    />
+                )}
             </div>
 
-            {/* Task Detail Modal - dengan mode create/edit */}
             <TaskDetailModal
                 isOpen={showDetailModal}
                 onClose={closeModals}
