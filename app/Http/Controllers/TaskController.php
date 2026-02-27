@@ -14,11 +14,12 @@ class TaskController extends Controller
             'task_date' => 'required|date',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'status' => 'nullable|in:todo,in_progress,on_hold,code_review,done,cancelled',
-            'priority' => 'nullable|in:low,medium,high',
+            'status' => 'nullable|in:todo,in_progress,on_hold,code_review,ready_qa,ready_dev,done,cancelled',
+            'priority' => 'nullable|in:low,medium,high,critical',
             'story_points' => 'nullable|integer|min:0|max:100',
             'project_id' => 'nullable|exists:projects,id',
             'notes' => 'nullable|string',
+            'link_pull_request' => 'nullable|string',
         ]);
 
         $task = $period->tasks()->create([
@@ -30,6 +31,7 @@ class TaskController extends Controller
             'story_points' => $validated['story_points'] ?? null,
             'notes' => $validated['notes'] ?? null,
             'project_id' => $validated['project_id'] ?? null,
+            'link_pull_request' => $validated['link_pull_request'] ?? null,
         ]);
 
         return back()->with('newTaskId', $task->id);
@@ -42,12 +44,16 @@ class TaskController extends Controller
             'title' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'status' => 'sometimes|in:todo,in_progress,on_hold,code_review,ready_qa,ready_dev,done,cancelled',
-            'priority' => 'sometimes|in:low,medium,high',
+            'priority' => 'sometimes|in:low,medium,high,critical',
             'story_points' => 'nullable|integer|min:0|max:100',
             'project_id' => 'nullable|exists:projects,id',
             'notes' => 'nullable|string',
             'link_pull_request' => 'nullable|string',
         ]);
+
+        if (isset($validated['status']) && $validated['status'] !== $task->status->value) {
+            $validated['status_changed_at'] = now();
+        }
 
         $task->update($validated);
 

@@ -1,10 +1,9 @@
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { CalendarData, CalendarTask } from '@/Pages/Periods/types/period';
 import CalendarDay from './CalendarDay';
-import GenerateReportModal from '@/Pages/Periods/Components/ShowPeriod/GenerateReportModal';
 import toast from 'react-hot-toast';
 
 interface CalendarViewProps {
