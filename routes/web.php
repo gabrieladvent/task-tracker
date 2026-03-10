@@ -34,6 +34,9 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('periods/{period}')->group(function () {
         Route::post('/tasks', [TaskController::class, 'store'])->name('periods.tasks.store');
+
+        Route::post('/generate-tasks', [TaskController::class, 'generateTasks'])
+            ->name('periods.generate-tasks');
     });
 
     Route::get('/project', [ProjectController::class, 'getAllProject'])->name('projects.api.index');
