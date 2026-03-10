@@ -56,6 +56,9 @@ class HandleInertiaRequests extends Middleware
                     fn () => \App\Models\TechDevTask::count()
                 ),
             ] : [],
+            'app' => [
+                'env' => app()->environment(),
+            ],
         ];
     }
 }

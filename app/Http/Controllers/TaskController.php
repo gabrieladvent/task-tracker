@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Period;
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 
 class TaskController extends Controller
 {
@@ -65,5 +66,26 @@ class TaskController extends Controller
         $task->delete();
 
         return back();
+    }
+
+    public function generateTasks(Request $request, Period $period)
+    {
+        if (! app()->isLocal()) {
+            abort(403, 'This feature is only available in development.');
+        }
+
+        $params = [];
+
+        if ($request->filled('from_date')) {
+            $params['--from-date'] = $request->from_date;
+        }
+
+        if ($request->filled('to_date')) {
+            $params['--date'] = $request->to_date;
+        }
+
+        Artisan::call('tasks:copy-incomplete', $params);
+
+        return back()->with('success', 'Tasks generated successfully.');
     }
 }
