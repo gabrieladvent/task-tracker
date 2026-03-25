@@ -1,40 +1,46 @@
 import { motion } from 'framer-motion';
+import { Calendar, List, Columns3 } from 'lucide-react';
+
+type View = 'calendar' | 'list' | 'board';
 
 interface ViewToggleProps {
-    view: 'calendar' | 'list' | 'board';
-    onViewChange: (view: 'calendar' | 'list' | 'board') => void;
+    view: View;
+    onViewChange: (view: View) => void;
 }
 
-export default function ViewToggle({ view, onViewChange }: ViewToggleProps) {
-    const buttons: { key: 'calendar' | 'list' | 'board'; label: string }[] = [
-        { key: 'calendar', label: 'Calendar' },
-        { key: 'list', label: 'List' },
-        { key: 'board', label: 'Board' },
-    ];
+const VIEWS: { key: View; label: string; icon: React.ElementType }[] = [
+    { key: 'calendar', label: 'Calendar', icon: Calendar },
+    { key: 'list', label: 'List', icon: List },
+    { key: 'board', label: 'Board', icon: Columns3 },
+];
 
+export default function ViewToggle({ view, onViewChange }: ViewToggleProps) {
     return (
         <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 overflow-hidden"
+            className="flex items-center gap-1 p-1 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
         >
-            {buttons.map(({ key, label }, idx) => (
-                <motion.button
-                    key={key}
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => onViewChange(key)}
-                    className={`px-4 py-2 text-sm font-medium transition-colors
-                        ${idx > 0 ? 'border-l border-gray-300 dark:border-slate-600' : ''}
-                        ${view === key
-                            ? 'bg-gray-800 dark:bg-slate-600 text-white shadow-sm'
-                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'
-                        }
-                    `}
-                >
-                    {label}
-                </motion.button>
-            ))}
+            {VIEWS.map(({ key, label, icon: Icon }) => {
+                const isActive = view === key;
+                return (
+                    <button
+                        key={key}
+                        onClick={() => onViewChange(key)}
+                        className={`
+                            relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm
+                            transition-colors duration-150 font-medium
+                            ${isActive
+                                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-white/60 dark:hover:bg-gray-700/50'
+                            }
+                        `}
+                    >
+                        <Icon size={14} strokeWidth={isActive ? 2 : 1.75} />
+                        {label}
+                    </button>
+                );
+            })}
         </motion.div>
     );
 }

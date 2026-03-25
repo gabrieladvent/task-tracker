@@ -18,6 +18,8 @@ This application is optimized for real-world daily usage: tracking progress, car
 - View current and past periods
 - Track task completion within periods
 - Calendar view for easy task visualization
+- List view for list visualization
+- Board Kanban view for better unique visualisation
 
 ### 📁 Project Organization
 - Create multiple projects with descriptions
