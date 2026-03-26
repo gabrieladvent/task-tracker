@@ -50,5 +50,7 @@ export default function Index({ periods }: Props) {
                 onClose={() => setIsModalOpen(false)}
             />
         </AuthenticatedLayout>
+
+        
     );
 }
