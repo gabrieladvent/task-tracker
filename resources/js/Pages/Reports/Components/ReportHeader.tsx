@@ -19,15 +19,15 @@ export default function ReportHeader({ title, subtitle, backLink }: ReportHeader
         >
             <div className="flex items-center justify-between mb-4">
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h2>
                     {subtitle && (
-                        <p className="text-sm text-gray-600">{subtitle}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{subtitle}</p>
                     )}
                 </div>
                 {backLink && (
                     <Link
                         href={backLink.href}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                     >
                         ← {backLink.label}
                     </Link>

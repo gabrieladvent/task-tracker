@@ -57,8 +57,6 @@ export interface CalendarData {
     month: string;
 }
 
-
-
 export interface PeriodFormData {
     name: string;
     start_date: string | undefined;
@@ -81,11 +79,11 @@ export interface CalendarTask {
 
 export interface CalendarWeek extends Array<CalendarDay> {}
 
-
 export interface Props {
     period: Period;
     tasksByDate: TasksByDate[];
     calendarData: CalendarData;
+    boardData: BoardData;
 }
 
 export interface NewTaskData {
@@ -95,4 +93,21 @@ export interface NewTaskData {
     priority: string;
     story_points: string;
     project_id?: string;
+}
+
+export interface BoardTask extends CalendarTask {
+    project_name: string | null;
+    project_color: string | null;
+}
+
+export interface BoardColumn {
+    status: string;
+    label: string;
+    color: string;
+    bg: string;
+    tasks: BoardTask[];
+}
+
+export interface BoardData {
+    columns: BoardColumn[];
 }

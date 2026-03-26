@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useMemo } from 'react';
+import { Plus, ChevronDown, ChevronRight } from 'lucide-react';
 import { TasksByDate, CalendarTask } from '@/Pages/Periods/types/period';
-import { getStatusColor, getPriorityColor } from '@/Pages/Periods/utils';
+import { getStatusColor, getPriorityColor, getStatusLabel } from '@/Pages/Periods/utils';
 
 interface ListViewProps {
     tasksByDate: TasksByDate[];
@@ -9,221 +10,233 @@ interface ListViewProps {
     onTaskClick: (task: CalendarTask) => void;
 }
 
+function ActivityBadge({ task }: { task: any }) {
+    if (task.is_status_changed_today) return (
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 text-xs font-medium text-blue-700 dark:text-blue-400">
+            <svg className="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Updated
+        </span>
+    );
+    if (task.is_new_today) return (
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+            <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            </span>
+            New
+        </span>
+    );
+    if (task.is_carry_over) return (
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 dark:bg-amber-900/30 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-400">
+            <svg className="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Carry-over
+        </span>
+    );
+    return null;
+}
+
+function getTaskRowStyle(task: any): string {
+    const base = 'flex items-center gap-4 px-5 py-3.5 border-b border-gray-50 dark:border-slate-700/50 last:border-none cursor-pointer transition-colors border-l-2';
+    if (task.is_status_changed_today) return `${base} border-l-blue-400 bg-blue-50/40 dark:bg-blue-950/20 hover:bg-blue-50/70 dark:hover:bg-blue-950/30`;
+    if (task.is_new_today) return `${base} border-l-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20 hover:bg-emerald-50/70 dark:hover:bg-emerald-950/30`;
+    if (task.is_carry_over) return `${base} border-l-amber-400 bg-amber-50/30 dark:bg-amber-950/20 hover:bg-amber-50/60 dark:hover:bg-amber-950/30`;
+    return `${base} border-l-transparent hover:bg-gray-50 dark:hover:bg-slate-700/40`;
+}
+
+function getProgressColor(pct: number): string {
+    if (pct >= 100) return 'bg-emerald-500';
+    if (pct >= 50) return 'bg-amber-400';
+    return 'bg-red-400';
+}
+
 export default function ListView({ tasksByDate, onAddTask, onTaskClick }: ListViewProps) {
-    const today = useMemo(() => {
-        const now = new Date();
-        return now.toISOString().split('T')[0];
-    }, []);
+    const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
     const [collapsedDates, setCollapsedDates] = useState<Set<string>>(() => {
-        const collapsed = new Set<string>();
-        tasksByDate.forEach(dateGroup => {
-            if (dateGroup.date !== today) {
-                collapsed.add(dateGroup.date);
-            }
-        });
-        return collapsed;
+        const s = new Set<string>();
+        tasksByDate.forEach(g => { if (g.date !== today) s.add(g.date); });
+        return s;
     });
 
-    const toggleCollapse = (date: string) => {
+    const toggle = (date: string) => {
         setCollapsedDates(prev => {
-            const newSet = new Set(prev);
-            if (newSet.has(date)) {
-                newSet.delete(date);
-            } else {
-                newSet.add(date);
-            }
-            return newSet;
+            const next = new Set(prev);
+            next.has(date) ? next.delete(date) : next.add(date);
+            return next;
         });
     };
 
-    const collapsedItems = tasksByDate.filter(d => collapsedDates.has(d.date));
-    const expandedItems = tasksByDate.filter(d => !collapsedDates.has(d.date));
+    const collapsed = tasksByDate.filter(d => collapsedDates.has(d.date));
+    const expanded = tasksByDate.filter(d => !collapsedDates.has(d.date));
 
-    return (
+    if (tasksByDate.length === 0) return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-4"
+            className="rounded-xl border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800/90"
         >
-            {/* COLLAPSED ITEMS - GRID LAYOUT */}
-            {collapsedItems.length > 0 && (
-                <motion.div
-                    layout
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3"
-                >
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+                <svg className="mb-3 h-8 w-8 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <p className="text-sm text-gray-400 dark:text-gray-500">No tasks yet. Click + on any date to get started.</p>
+            </div>
+        </motion.div>
+    );
+
+    return (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
+
+            {/* ── Collapsed date cards ── */}
+            {collapsed.length > 0 && (
+                <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                     <AnimatePresence>
-                        {collapsedItems.map((dateGroup, index) => (
-                            <motion.div
-                                key={dateGroup.date}
-                                layout
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.9 }}
-                                transition={{ delay: index * 0.03 }}
-                                className="overflow-hidden bg-white dark:bg-slate-800/90 shadow-sm dark:shadow-slate-900/30 rounded-lg border border-gray-200 dark:border-slate-700 cursor-pointer hover:shadow-md hover:border-gray-300 dark:hover:border-slate-600 transition-all"
-                                onClick={() => toggleCollapse(dateGroup.date)}
-                            >
-                                <div className="p-3 bg-gray-50 dark:bg-slate-900/60">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <motion.svg
-                                            className="h-4 w-4 text-gray-400 dark:text-gray-500"
-                                            animate={{ rotate: 0 }}
-                                            transition={{ duration: 0.3 }}
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                        </motion.svg>
-                                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
-                                            {dateGroup.day_name}
-                                        </h3>
-                                    </div>
-                                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-                                        {dateGroup.formatted_date}
-                                    </p>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-700/50 px-2 py-1 rounded-full">
-                                            {dateGroup.tasks.length} {dateGroup.tasks.length === 1 ? 'task' : 'tasks'}
-                                        </span>
+                        {collapsed.map((g, i) => {
+                            const done = g.tasks.filter((t: any) => t.status === 'done').length;
+                            const total = g.tasks.length;
+                            const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+                            return (
+                                <motion.div
+                                    key={g.date}
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    transition={{ delay: i * 0.02 }}
+                                    onClick={() => toggle(g.date)}
+                                    className="group rounded-lg border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800/80 p-3 cursor-pointer hover:border-gray-200 dark:hover:border-slate-600 hover:bg-gray-50/50 dark:hover:bg-slate-700/50 transition-all"
+                                >
+                                    <div className="flex items-start justify-between mb-1">
+                                        <div>
+                                            <p className="text-[10px] font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                                                {g.day_name}
+                                            </p>
+                                            <p className="text-sm font-medium text-gray-800 dark:text-gray-100 mt-0.5">
+                                                {g.formatted_date}
+                                            </p>
+                                        </div>
                                         <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onAddTask(dateGroup.date);
-                                            }}
-                                            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                                            onClick={(e) => { e.stopPropagation(); onAddTask(g.date); }}
+                                            className="opacity-0 group-hover:opacity-100 flex h-5 w-5 items-center justify-center rounded-full border border-gray-200 dark:border-slate-600 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-all"
                                         >
-                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                            </svg>
+                                            <Plus size={10} />
                                         </button>
                                     </div>
-                                </div>
-                            </motion.div>
-                        ))}
+
+                                    {/* Mini progress bar */}
+                                    <div className="mt-2 h-1 rounded-full bg-gray-100 dark:bg-slate-700 overflow-hidden">
+                                        <div
+                                            className={`h-full rounded-full transition-all ${getProgressColor(pct)}`}
+                                            style={{ width: `${pct}%` }}
+                                        />
+                                    </div>
+                                    <p className="mt-1.5 text-xs text-gray-400 dark:text-gray-500">
+                                        {done}/{total} done
+                                    </p>
+                                </motion.div>
+                            );
+                        })}
                     </AnimatePresence>
                 </motion.div>
             )}
 
-            {/* EXPANDED ITEMS - FULL WIDTH LIST */}
+            {/* ── Expanded date groups ── */}
             <AnimatePresence>
-                {expandedItems.map((dateGroup, index) => {
-                    const isToday = dateGroup.date === today;
+                {expanded.map((g, i) => {
+                    const isToday = g.date === today;
 
                     return (
                         <motion.div
-                            key={dateGroup.date}
+                            key={g.date}
                             layout
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ delay: index * 0.05 }}
-                            className="overflow-hidden bg-white dark:bg-slate-800/90 shadow-sm dark:shadow-slate-900/30 sm:rounded-lg border border-gray-200 dark:border-slate-700"
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ delay: i * 0.04 }}
+                            className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800/90"
                         >
-                            <motion.div
-                                className="border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/60 p-4 flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-900/80 transition-colors"
-                                onClick={() => toggleCollapse(dateGroup.date)}
+                            {/* Header */}
+                            <div
+                                onClick={() => toggle(g.date)}
+                                className="flex items-center justify-between px-5 py-4 bg-gray-50/70 dark:bg-slate-900/40 border-b border-gray-100 dark:border-slate-700 cursor-pointer hover:bg-gray-100/60 dark:hover:bg-slate-900/60 transition-colors"
                             >
-                                <div className="flex items-center gap-3">
-                                    <motion.svg
-                                        className="h-5 w-5 text-gray-500 dark:text-gray-400"
-                                        animate={{ rotate: 90 }}
-                                        transition={{ duration: 0.3 }}
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </motion.svg>
-                                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                                        {dateGroup.day_name}, {dateGroup.formatted_date}
-                                        {isToday && (
-                                            <span className="ml-2 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-full">
-                                                Today
-                                            </span>
-                                        )}
-                                    </h3>
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                                        ({dateGroup.tasks.length})
+                                <div className="flex items-center gap-2">
+                                    <ChevronDown size={16} className="text-gray-400 dark:text-gray-500 shrink-0" />
+                                    <span className="text-sm font-medium text-gray-800 dark:text-gray-100">
+                                        {g.day_name}, {g.formatted_date}
+                                    </span>
+                                    {isToday && (
+                                        <span className="rounded-full bg-blue-50 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-medium text-blue-600 dark:text-blue-400">
+                                            Today
+                                        </span>
+                                    )}
+                                    <span className="text-xs text-gray-400 dark:text-gray-500">
+                                        {g.tasks.length} tasks
                                     </span>
                                 </div>
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onAddTask(dateGroup.date);
-                                    }}
-                                    className="flex items-center gap-1 rounded-md bg-gray-800 dark:bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-700 dark:hover:bg-blue-700 transition-colors shadow-sm"
-                                >
-                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    Add Task
-                                </motion.button>
-                            </motion.div>
 
-                            <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.3, ease: 'easeInOut' }}
-                                className="overflow-hidden"
-                            >
-                                <div className="divide-y divide-gray-200 dark:divide-slate-700">
-                                    {dateGroup.tasks.map((task, taskIndex) => (
-                                        <motion.div
-                                            key={task.id}
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: taskIndex * 0.05 }}
-                                            className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
-                                            onClick={() => onTaskClick(task as CalendarTask)}
-                                        >
-                                            <div className="flex items-start justify-between">
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className={`h-2.5 w-2.5 rounded-full ${getStatusColor(task.status)} shadow-sm`} />
-                                                        <h4 className="font-medium text-gray-900 dark:text-gray-100">{task.title}</h4>
-                                                        <span className="rounded-full bg-gray-100 dark:bg-slate-700/70 px-2 py-0.5 text-xs font-medium text-gray-600 dark:text-gray-200">
-                                                            {task.story_points ?? 0} pts
-                                                        </span>
-                                                    </div>
-                                                    {task.project && (
-                                                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{task.project}</p>
-                                                    )}
-                                                    <div className="mt-2 flex items-center gap-2 text-xs">
-                                                        <span className={`font-medium ${getPriorityColor(task.priority)} px-2 py-1 rounded-md bg-gray-100 dark:bg-slate-700/60`}>
-                                                            {task.priority.toUpperCase()}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            </motion.div>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); onAddTask(g.date); }}
+                                    className="flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+                                >
+                                    <Plus size={13} />
+                                    Add task
+                                </button>
+                            </div>
+
+                            {/* Task rows */}
+                            <div>
+                                {g.tasks.map((task: any, ti: number) => (
+                                    <motion.div
+                                        key={task.id}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: ti * 0.03 }}
+                                        className={getTaskRowStyle(task)}
+                                        onClick={() => onTaskClick(task as CalendarTask)}
+                                    >
+                                        {/* Status dot */}
+                                        <span className={`h-3 w-3 rounded-full shrink-0 ${getStatusColor(task.status)}`} />
+
+                                        {/* Title + project */}
+                                        <div className="flex-1 min-w-0">
+                                            <p className={`text-base font-medium truncate ${task.status === 'done' ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-800 dark:text-gray-100'}`}>
+                                                {task.title}
+                                            </p>
+                                            {task.project && (
+                                                <p className="text-sm text-gray-400 dark:text-gray-500 truncate mt-0.5">
+                                                    {task.project}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {/* Right side meta */}
+                                        <div className="flex items-center gap-2 shrink-0">
+                                            <ActivityBadge task={task} />
+                                            {task.story_points != null && (
+                                                <span className="text-xs text-gray-400 dark:text-gray-500">
+                                                    {task.story_points} pts
+                                                </span>
+                                            )}
+                                            <span className={`text-xs font-medium px-2.5 py-1 rounded ${getPriorityColor(task.priority)}`}>
+                                                {task.priority}
+                                            </span>
+                                            <span className="rounded-full border border-gray-100 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 px-3 py-1 text-xs text-gray-500 dark:text-gray-400">
+                                                {getStatusLabel(task.status)}
+                                            </span>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
                         </motion.div>
                     );
                 })}
             </AnimatePresence>
-
-            {tasksByDate.length === 0 && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="overflow-hidden bg-white dark:bg-gray-800 shadow-sm dark:shadow-gray-900/30 sm:rounded-lg border border-gray-200 dark:border-gray-700"
-                >
-                    <div className="p-12 text-center text-gray-500 dark:text-gray-400">
-                        <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                        No tasks yet. Click the + button on any date to create your first task.
-                    </div>
-                </motion.div>
-            )}
         </motion.div>
     );
 }

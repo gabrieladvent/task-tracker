@@ -12,9 +12,9 @@ export default function ReportSummaryCards({
     totalStoryPoints
 }: ReportSummaryCardsProps) {
     const cards = [
-        { label: 'Total Tasks', value: totalTasks, color: 'text-gray-900', delay: 0.1 },
-        { label: 'Completed Tasks', value: completedTasks, color: 'text-green-600', delay: 0.2 },
-        { label: 'Total Story Points', value: totalStoryPoints, color: 'text-blue-600', delay: 0.3 },
+        { label: 'Total Tasks', value: totalTasks, color: 'text-gray-900 dark:text-white', delay: 0.1 },
+        { label: 'Completed Tasks', value: completedTasks, color: 'text-green-600 dark:text-green-400', delay: 0.2 },
+        { label: 'Total Story Points', value: totalStoryPoints, color: 'text-blue-600 dark:text-blue-400', delay: 0.3 },
     ];
 
     return (
@@ -25,9 +25,9 @@ export default function ReportSummaryCards({
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: card.delay }}
-                    className="bg-white rounded-lg shadow-sm p-4"
+                    className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4"
                 >
-                    <div className="text-sm text-gray-600">{card.label}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">{card.label}</div>
                     <div className={`text-2xl font-bold ${card.color}`}>
                         {card.value}
                     </div>

@@ -1,10 +1,9 @@
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { CalendarData, CalendarTask } from '@/Pages/Periods/types/period';
 import CalendarDay from './CalendarDay';
-import GenerateReportModal from '@/Pages/Periods/Components/ShowPeriod/GenerateReportModal';
 import toast from 'react-hot-toast';
 
 interface CalendarViewProps {
@@ -15,22 +14,17 @@ interface CalendarViewProps {
     periodName: string;
 }
 
-export default function CalendarView({ calendarData, onAddTask, onTaskClick, periodId, periodName }: CalendarViewProps) {
-    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+export default function CalendarView({ calendarData, onAddTask, onTaskClick, periodId }: CalendarViewProps) {
     const [activeTask, setActiveTask] = useState<CalendarTask | null>(null);
-    const [showGenerateModal, setShowGenerateModal] = useState(false);
 
     const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 8,
-            },
-        })
+        useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
     );
 
     const handleDragStart = (event: DragStartEvent) => {
-        const task = event.active.data.current as CalendarTask;
-        setActiveTask(task);
+        setActiveTask(event.active.data.current as CalendarTask);
     };
 
     const handleDragEnd = (event: DragEndEvent) => {
@@ -40,23 +34,16 @@ export default function CalendarView({ calendarData, onAddTask, onTaskClick, per
             const task = active.data.current as CalendarTask;
             const targetDate = over.data.current.date as string;
 
-            // Validasi: Cegah drop ke tanggal yang sama
             if (task.task_date === targetDate) {
-                toast.error('Cannot copy task to the same date!', {
+                toast.error('Task is already on this date', {
                     duration: 2000,
                     position: 'top-center',
-                    icon: '❌',
-                    style: {
-                        borderRadius: '10px',
-                        background: '#fee',
-                        color: '#c00',
-                    },
+                    style: { borderRadius: '8px', fontSize: '13px' },
                 });
                 setActiveTask(null);
                 return;
             }
 
-            // Copy task ke tanggal baru
             router.post(`/periods/${periodId}/tasks`, {
                 task_date: targetDate,
                 title: task.title,
@@ -69,111 +56,76 @@ export default function CalendarView({ calendarData, onAddTask, onTaskClick, per
                 link_pull_request: task.link_pull_request,
             }, {
                 preserveScroll: true,
-                onSuccess: () => {
-                    toast.success('Task copied successfully!', {
-                        duration: 2000,
-                        position: 'top-center',
-                        icon: '✅',
-                        style: {
-                            borderRadius: '10px',
-                            background: '#efe',
-                            color: '#060',
-                        },
-                    });
-                },
-                onError: () => {
-                    toast.error('Failed to copy task', {
-                        duration: 2000,
-                        position: 'top-center',
-                    });
-                }
+                onSuccess: () => toast.success('Task copied', {
+                    duration: 2000,
+                    position: 'top-center',
+                    style: { borderRadius: '8px', fontSize: '13px' },
+                }),
+                onError: () => toast.error('Failed to copy task', {
+                    duration: 2000,
+                    position: 'top-center',
+                }),
             });
         }
 
         setActiveTask(null);
     };
 
-    const handleDragCancel = () => {
-        setActiveTask(null);
-    };
-
     return (
-        <>
-            <DndContext
-                sensors={sensors}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
-                onDragCancel={handleDragCancel}
+        <DndContext
+            sensors={sensors}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragCancel={() => setActiveTask(null)}
+        >
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800/90 shadow-sm"
             >
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden bg-white dark:bg-slate-800/90 shadow-sm sm:rounded-lg"
-                >
-                    <div className="p-6">
-
-                        {/* Generate Report Button */}
-                        <div className="mb-4 flex justify-end">
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => setShowGenerateModal(true)}
-                                className="flex items-center gap-2 rounded-lg bg-gray-600 dark:bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 dark:hover:bg-slate-600 transition-colors"
-                            >
-                                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                Generate Report
-                            </motion.button>
+                {/* Day-of-week header */}
+                <div className="grid grid-cols-7 border-b border-gray-100 dark:border-slate-700 bg-gray-50/60 dark:bg-slate-900/40">
+                    {DAYS_OF_WEEK.map((day) => (
+                        <div
+                            key={day}
+                            className="py-2.5 text-center text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500"
+                        >
+                            {day}
                         </div>
+                    ))}
+                </div>
 
-                        <div className="grid grid-cols-7 gap-1">
-                            {daysOfWeek.map((day) => (
-                                <motion.div
-                                    key={day}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.2 }}
-                                    className="p-2 text-center text-xs font-medium text-gray-500 dark:text-gray-300"
-                                >
-                                    {day}
-                                </motion.div>
-                            ))}
+                {/* Calendar grid */}
+                <div className="grid grid-cols-7">
+                    {calendarData.weeks.map((week, weekIdx) =>
+                        week.map((day, dayIdx) => (
+                            <CalendarDay
+                                key={`${weekIdx}-${dayIdx}`}
+                                day={day}
+                                onAddTask={onAddTask}
+                                onTaskClick={onTaskClick}
+                                activeTaskDate={activeTask?.task_date ?? null}
+                            />
+                        ))
+                    )}
+                </div>
+            </motion.div>
 
-                            {calendarData.weeks.map((week, weekIdx) => (
-                                week.map((day, dayIdx) => (
-                                    <CalendarDay
-                                        key={`${weekIdx}-${dayIdx}`}
-                                        day={day}
-                                        onAddTask={onAddTask}
-                                        onTaskClick={onTaskClick}
-                                        activeTaskDate={activeTask?.task_date ?? null}
-                                    />
-                                ))
-                            ))}
-                        </div>
+            <DragOverlay dropAnimation={{ duration: 150, easing: 'ease' }}>
+                {activeTask && (
+                    <div className="rotate-1 rounded-lg border border-blue-200 dark:border-blue-700 bg-white dark:bg-slate-800 px-3 py-2 shadow-lg">
+                        <p className="text-xs font-medium text-gray-800 dark:text-gray-100 truncate max-w-[160px]">
+                            {activeTask.title}
+                        </p>
+                        {activeTask.project && (
+                            <p className="mt-0.5 text-[10px] text-gray-400 dark:text-gray-500 truncate">
+                                {activeTask.project}
+                            </p>
+                        )}
                     </div>
-                </motion.div>
-
-                <DragOverlay>
-                    {activeTask ? (
-                        <div className="bg-white dark:bg-gray-800 rounded px-3 py-2 shadow-2xl border-2 border-blue-400 dark:border-blue-500 transform rotate-3">
-                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{activeTask.title}</div>
-                            {activeTask.project && (
-                                <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">{activeTask.project}</div>
-                            )}
-                        </div>
-                    ) : null}
-                </DragOverlay>
-            </DndContext>
-
-            <GenerateReportModal
-                isOpen={showGenerateModal}
-                onClose={() => setShowGenerateModal(false)}
-                periodId={periodId}
-                periodName={periodName}
-            />
-        </>
+                )}
+            </DragOverlay>
+        </DndContext>
     );
 }

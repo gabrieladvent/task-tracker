@@ -22,7 +22,6 @@ export default function Pagination({ links }: PaginationProps) {
                 const isFirst = index === 0;
                 const isLast = index === links.length - 1;
 
-                // Parse label for previous/next
                 let displayLabel = link.label;
                 if (isFirst) displayLabel = '←';
                 if (isLast) displayLabel = '→';
@@ -35,7 +34,7 @@ export default function Pagination({ links }: PaginationProps) {
                                 className={`
                                     px-3 py-2 rounded-lg text-sm font-medium transition-colors
                                     ${link.active
-                                        ? 'bg-gray-800 text-white'
+                                        ? 'bg-gray-800 text-white dark:text-gray-200 dark:bg-gray-700'
                                         : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
                                     }
                                 `}

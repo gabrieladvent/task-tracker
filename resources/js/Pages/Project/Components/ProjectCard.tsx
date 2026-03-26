@@ -19,7 +19,7 @@ export default function ProjectCard({ project, index, onEdit, onView }: Props) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
             whileHover={{ y: -5 }}
-            className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow overflow-hidden cursor-pointer"
+            className="bg-white dark:bg-gray-700 rounded-lg shadow-md hover:shadow-xl transition-shadow overflow-hidden cursor-pointer"
             onClick={() => onView(project)}
         >
             <div
@@ -37,17 +37,17 @@ export default function ProjectCard({ project, index, onEdit, onView }: Props) {
                             <Folder size={24} style={{ color: projectColor }} />
                         </div>
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
                                 {project.name}
                             </h3>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">
                                 Created {project.created_at}
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2 min-h-[40px]">
+                <p className="text-gray-600 dark:text-gray-200 text-sm mb-4 line-clamp-2 min-h-[40px]">
                     {project.description || 'No description provided'}
                 </p>
 

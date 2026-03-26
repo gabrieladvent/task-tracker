@@ -73,8 +73,8 @@ export default function Index({ projects, filters }: Props) {
                         className="mb-6"
                     >
                         <div className="mb-4">
-                            <h2 className="text-2xl font-bold text-gray-900">Projects</h2>
-                            <p className="mt-1 text-sm text-gray-600">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-200">Projects</h2>
+                            <p className="mt-1 text-sm text-gray-600 dark:text-gray-200">
                                 Manage and organize your projects
                             </p>
                         </div>
@@ -123,7 +123,7 @@ export default function Index({ projects, filters }: Props) {
                             <Pagination links={projects.links} />
 
                             {/* Info */}
-                            <div className="text-center text-sm text-gray-600 mt-4">
+                            <div className="text-center text-sm text-gray-600 dark:text-gray-200 mt-4">
                                 Showing {projects.data.length} of {projects.total} projects
                             </div>
                         </>
@@ -131,11 +131,11 @@ export default function Index({ projects, filters }: Props) {
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="bg-white rounded-lg shadow-sm p-12 text-center"
+                            className="bg-white dark:bg-gray-700 rounded-lg shadow-sm p-12 text-center"
                         >
-                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-600 rounded-full mb-4">
                                 <svg
-                                    className="w-8 h-8 text-gray-400"
+                                    className="w-8 h-8 text-gray-400 dark:text-gray-200"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -148,10 +148,10 @@ export default function Index({ projects, filters }: Props) {
                                     />
                                 </svg>
                             </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">
                                 {filters.search ? 'No projects found' : 'No projects yet'}
                             </h3>
-                            <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                            <p className="text-gray-500 dark:text-gray-200 mb-6 max-w-md mx-auto">
                                 {filters.search
                                     ? `No projects match "${filters.search}"`
                                     : 'Get started by creating your first project'
@@ -162,7 +162,7 @@ export default function Index({ projects, filters }: Props) {
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     onClick={handleCreate}
-                                    className="inline-flex items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors"
+                                    className="inline-flex items-center gap-2 rounded-md dark:bg-gray-100 dark:text-gray-800 bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors"
                                 >
                                     <Plus size={20} />
                                     Create Project

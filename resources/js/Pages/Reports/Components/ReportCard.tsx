@@ -30,42 +30,42 @@ export default function ReportCard({ report, periodId, index, showPeriodBadge = 
         >
             <Link
                 href={`/periods/${periodId}/reports/${report.id}`}
-                className="block bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
+                className="block bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70 transition-shadow p-6"
             >
                 {showPeriodBadge && report.period && (
                     <div className="mb-3">
-                        <span className="inline-block px-3 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                        <span className="inline-block px-3 py-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 rounded-full">
                             {report.period.name}
                         </span>
                     </div>
                 )}
 
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 truncate">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 truncate">
                     {report.report_name}
                 </h3>
 
                 {showPeriodBadge && report.period && (
-                    <p className="text-xs text-gray-500 mb-3">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
                         {report.period.start_date} - {report.period.end_date}
                     </p>
                 )}
 
-                <div className="space-y-2 text-sm text-gray-600">
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex justify-between">
                         <span>Total Tasks:</span>
-                        <span className="font-medium">{report.total_tasks}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{report.total_tasks}</span>
                     </div>
                     <div className="flex justify-between">
                         <span>Completed:</span>
-                        <span className="font-medium text-green-600">
+                        <span className="font-medium text-green-600 dark:text-green-400">
                             {report.completed_tasks}
                         </span>
                     </div>
                     <div className="flex justify-between">
                         <span>Story Points:</span>
-                        <span className="font-medium">{report.total_story_points}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{report.total_story_points}</span>
                     </div>
-                    <div className="text-xs text-gray-500 mt-3 pt-3 border-t">
+                    <div className="text-xs text-gray-500 dark:text-gray-500 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                         Created: {report.created_at}
                     </div>
                 </div>

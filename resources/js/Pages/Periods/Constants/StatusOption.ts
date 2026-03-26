@@ -14,6 +14,8 @@ export const STATUS_OPTIONS = [
     { value: "in_progress", label: "In Progress" },
     { value: "on_hold", label: "On Hold" },
     { value: "code_review", label: "Code Review" },
+    { value: "ready_qa", label: "Ready for QA" },
+    { value: "ready_dev", label: "Ready for Dev" },
     { value: "done", label: "Done" },
     { value: "cancelled", label: "Cancelled" },
 ];

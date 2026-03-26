@@ -11,7 +11,7 @@ export default function PerPageSelector({ currentPerPage }: PerPageSelectorProps
     const handleChange = (value: number) => {
         const params = new URLSearchParams(window.location.search);
         params.set('per_page', value.toString());
-        params.delete('page'); // Reset to page 1
+        params.delete('page');
 
         router.get(
             `${window.location.pathname}?${params.toString()}`,
@@ -26,11 +26,11 @@ export default function PerPageSelector({ currentPerPage }: PerPageSelectorProps
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center gap-2"
         >
-            <span className="text-sm text-gray-600">Show:</span>
+            <span className="text-sm text-gray-600 dark:text-gray-200">Show:</span>
             <select
                 value={currentPerPage}
                 onChange={(e) => handleChange(Number(e.target.value))}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:ring-gray-500"
+                className="rounded-lg border border-gray-300 dark:bg-gray-600 dark:text-gray-200 px-3 py-2 text-sm focus:border-gray-500 focus:ring-gray-500"
             >
                 {options.map((option) => (
                     <option key={option} value={option}>
@@ -38,7 +38,7 @@ export default function PerPageSelector({ currentPerPage }: PerPageSelectorProps
                     </option>
                 ))}
             </select>
-            <span className="text-sm text-gray-600">per page</span>
+            <span className="text-sm text-gray-600 dark:text-gray-200">per page</span>
         </motion.div>
     );
 }
