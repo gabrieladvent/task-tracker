@@ -1,4 +1,3 @@
-// resources/js/Pages/Periods/Components/ShowPeriod/CalendarDay.tsx
 import { useDroppable } from '@dnd-kit/core';
 import { motion } from 'framer-motion';
 import { CalendarDay as CalendarDayType, CalendarTask } from '@/Pages/Periods/types/period';
@@ -13,116 +12,108 @@ interface CalendarDayProps {
 
 export default function CalendarDay({ day, onAddTask, onTaskClick, activeTaskDate }: CalendarDayProps) {
     const isSameDate = activeTaskDate === day.date;
-
     const dayOfWeek = new Date(day.date).getDay();
     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
     const { setNodeRef, isOver } = useDroppable({
         id: day.date,
         disabled: !day.is_in_period || isSameDate,
-        data: { date: day.date }
+        data: { date: day.date },
     });
 
-    const getDropZoneStyle = () => {
-        if (!day.is_in_period) return 'bg-gray-50 dark:bg-gray-900/70';
-
-        if (isSameDate && isOver) return 'bg-red-50 dark:bg-red-950/60 ring-2 ring-red-400 dark:ring-red-500';
-
-        if (isSameDate) return 'bg-gray-100 dark:bg-gray-900/80 opacity-50';
-
-        if (isOver) return 'ring-2 ring-green-400 dark:ring-green-500 bg-green-50 dark:bg-green-950/50';
-
-        if (isWeekend) return 'bg-blue-50/50 dark:bg-slate-800/80 hover:bg-blue-100/60 dark:hover:bg-slate-700/90';
-
-        return 'bg-white dark:bg-slate-800/60 hover:bg-gray-50 dark:hover:bg-slate-700/70';
+    const getCellBg = () => {
+        if (!day.is_in_period) return 'bg-gray-50 dark:bg-gray-900/40';
+        if (isSameDate && isOver) return 'bg-red-50 dark:bg-red-950/40';
+        if (isSameDate) return 'bg-gray-50 dark:bg-gray-900/60 opacity-60';
+        if (isOver) return 'bg-emerald-50 dark:bg-emerald-950/40';
+        if (day.is_today) return 'bg-blue-50/70 dark:bg-blue-950/30';
+        if (isWeekend) return 'bg-slate-50 dark:bg-slate-800/40';
+        return 'bg-white dark:bg-slate-800/60 hover:bg-gray-50/80 dark:hover:bg-slate-700/50';
     };
 
-    const getDayNumberColor = () => {
-        if (day.is_today) return 'text-blue-600 dark:text-blue-400 font-bold';
-        if (isWeekend) return 'text-blue-600 dark:text-sky-400';
-        return 'text-gray-900 dark:text-gray-100';
+    const getBorderStyle = () => {
+        if (day.is_today) return 'border-blue-300 dark:border-blue-600';
+        if (isOver && !isSameDate) return 'border-emerald-300 dark:border-emerald-600';
+        if (isSameDate && isOver) return 'border-red-300 dark:border-red-600';
+        return 'border-gray-100 dark:border-slate-700/60';
     };
+
+    const getDayNumStyle = () => {
+        if (!day.is_in_period) return 'text-gray-300 dark:text-gray-700';
+        if (day.is_today) return 'text-white bg-blue-500 dark:bg-blue-500';
+        if (isWeekend) return 'text-blue-500 dark:text-blue-400';
+        return 'text-gray-700 dark:text-gray-200';
+    };
+
+    const visibleTasks = day.tasks?.slice(0, 4) ?? [];
+    const extraCount = (day.tasks?.length ?? 0) - visibleTasks.length;
 
     return (
         <motion.div
             ref={setNodeRef}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.2 }}
-            className={`min-h-32 border p-2 ${getDropZoneStyle()} ${day.is_today
-                    ? 'border-2 border-blue-500 dark:border-blue-400 shadow-md dark:shadow-blue-500/20'
-                    : isWeekend
-                        ? 'border-blue-200 dark:border-slate-700'
-                        : 'border-gray-200 dark:border-slate-700'
-                } transition-all duration-200 cursor-default relative`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
+            className={`
+                group relative min-h-[110px] border p-2
+                ${getCellBg()} ${getBorderStyle()}
+                transition-colors duration-150
+            `}
         >
-            {/* Indicator untuk invalid drop */}
-            {isSameDate && isOver && (
-                <div className="absolute inset-0 flex items-center justify-center bg-red-100 dark:bg-red-900/90 bg-opacity-90 z-10 rounded">
-                    <div className="text-center">
-                        <svg className="mx-auto h-8 w-8 text-red-500 dark:text-red-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        <p className="text-xs font-medium text-red-700 dark:text-red-200">Same date!</p>
-                    </div>
+            {/* Drop overlay — valid */}
+            {isOver && !isSameDate && day.is_in_period && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-1 rounded-[2px] bg-emerald-50/90 dark:bg-emerald-950/70">
+                    <svg className="h-5 w-5 text-emerald-600 dark:text-emerald-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M10 3v10m0 0-3-3m3 3 3-3M5 16h10" />
+                    </svg>
+                    <span className="text-[10px] font-medium text-emerald-700 dark:text-emerald-300">drop to copy</span>
                 </div>
             )}
 
-            {/* Indicator untuk valid drop */}
-            {!isSameDate && isOver && day.is_in_period && (
-                <div className="absolute inset-0 flex items-center justify-center bg-green-100 dark:bg-green-900/90 bg-opacity-90 z-10 rounded">
-                    <div className="text-center">
-                        <svg className="mx-auto h-8 w-8 text-green-500 dark:text-green-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                        </svg>
-                        <p className="text-xs font-medium text-green-700 dark:text-green-200">Drop to copy</p>
-                    </div>
+            {/* Drop overlay — invalid */}
+            {isOver && isSameDate && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-1 rounded-[2px] bg-red-50/90 dark:bg-red-950/70">
+                    <svg className="h-5 w-5 text-red-500 dark:text-red-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+                        <path d="M5 5l10 10M15 5 5 15" />
+                    </svg>
+                    <span className="text-[10px] font-medium text-red-600 dark:text-red-300">same date</span>
                 </div>
             )}
 
-            <div className="mb-1 flex items-center justify-between">
-                <div className={`text-sm font-semibold ${getDayNumberColor()}`}>
+            {/* Day header */}
+            <div className="mb-1.5 flex items-center justify-between">
+                <span className={`
+                    inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-medium leading-none
+                    ${getDayNumStyle()}
+                `}>
                     {day.day}
-                </div>
-                <div className="flex items-center gap-1.5">
+                </span>
+
+                <div className="flex items-center gap-1">
                     {day.is_in_period && day.tasks_count > 0 && (
-                        <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="rounded-full bg-gray-100 dark:bg-slate-700/80 px-1.5 py-0.5 text-[10px] font-bold"
-                        >
-                            <span className="text-green-600 dark:text-green-400">
-                                {day.completed_count}
-                            </span>
-                            <span className="text-gray-500 dark:text-gray-300">
-                                /{day.tasks_count}
-                            </span>
-                        </motion.div>
+                        <span className="rounded-full border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 px-1.5 py-px text-[10px] leading-none">
+                            <span className="font-medium text-emerald-600 dark:text-emerald-400">{day.completed_count}</span>
+                            <span className="text-gray-400 dark:text-gray-500">/{day.tasks_count}</span>
+                        </span>
                     )}
                     {day.is_in_period && (
-                        <motion.button
-                            whileHover={{ scale: 1.15, rotate: 90 }}
-                            whileTap={{ scale: 0.9 }}
+                        <button
                             onClick={() => onAddTask(day.date)}
-                            className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-all"
                             title="Add task"
+                            className="flex h-4 w-4 items-center justify-center rounded-full text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-700 dark:hover:text-gray-200"
                         >
-                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                            <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+                                <path d="M6 1v10M1 6h10" />
                             </svg>
-                        </motion.button>
+                        </button>
                     )}
                 </div>
             </div>
 
-            {day.is_in_period && day.tasks!.length > 0 && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.1 }}
-                    className="mt-2 space-y-1"
-                >
-                    {day.tasks!.slice(0, 4).map((task, index) => (
+            {/* Tasks */}
+            {day.is_in_period && visibleTasks.length > 0 && (
+                <div className="space-y-[3px]">
+                    {visibleTasks.map((task, index) => (
                         <DraggableTask
                             key={task.id}
                             task={task}
@@ -130,16 +121,12 @@ export default function CalendarDay({ day, onAddTask, onTaskClick, activeTaskDat
                             onClick={onTaskClick}
                         />
                     ))}
-                    {day.tasks!.length > 4 && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="px-2 py-1 text-[10px] font-medium text-gray-500 dark:text-gray-300 bg-gray-100 dark:bg-slate-700/70 rounded text-center"
-                        >
-                            +{day.tasks!.length - 4} more tasks
-                        </motion.div>
+                    {extraCount > 0 && (
+                        <div className="rounded bg-gray-50 dark:bg-slate-700/50 px-1.5 py-0.5 text-center text-[10px] text-gray-400 dark:text-gray-500">
+                            +{extraCount} more
+                        </div>
                     )}
-                </motion.div>
+                </div>
             )}
         </motion.div>
     );

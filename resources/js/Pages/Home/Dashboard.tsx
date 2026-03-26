@@ -1,132 +1,57 @@
+import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import DashboardCard from '@/Pages/Home/Components/DashboardCard';
-import WelcomeMessage from '@/Pages/Home/Components/WelcomeMessage';
 import { motion } from 'framer-motion';
+import { PastPeriod, PeriodStats, TodayTask } from './types/dashboard';
+import { DashboardHeader } from './Components/DashboardHeader';
+import { CurrentPeriodCard } from './Components/CurrentPeriodCard';
+import { TodayTaskList } from './Components/TodayTaskList';
+import { CompletionTrend } from './Components/CompletionTrend';
+import { QuickLinks } from './Components/QuickLinks';
+import { CopyCommandCard } from './Components/CopyCommandCard';
 
-export default function Dashboard() {
+interface Props {
+    currentPeriod: PeriodStats | null;
+    todayTasks: TodayTask[];
+    pastPeriods: PastPeriod[];
+    todayStr: string;
+}
+
+function fadeUp(delay = 0) {
+    return {
+        initial: { opacity: 0, y: 12 },
+        animate: { opacity: 1, y: 0 },
+        transition: { delay, duration: 0.3 },
+    };
+}
+
+export default function Dashboard({ currentPeriod, todayTasks, pastPeriods, todayStr }: Props) {
+    const today = new Date(todayStr);
+    const dayName = today.toLocaleString('default', { weekday: 'long' });
+    const dateLabel = today.toLocaleString('default', { day: 'numeric', month: 'long', year: 'numeric' });
+
     return (
         <AuthenticatedLayout>
             <Head title="Dashboard" />
 
-            <div className="py-10 w-full">
-                <div className="mx-auto max-w-full sm:px-6 lg:px-8">
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-full">
 
-                        <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
+                <DashboardHeader dayName={dayName} dateLabel={dateLabel} fadeUp={fadeUp} />
 
-                            <DashboardCard
-                                title="Periods"
-                                description="Manage your work periods"
-                                icon={
-                                    <svg
-                                        className="h-8 w-8 text-gray-400"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                        />
-                                    </svg>
-                                }
-                                href={route('periods.index')}
-                            />
-                        </motion.div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-
-                        <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            <DashboardCard
-                                title="Projects"
-                                description="Manage your projects"
-                                icon={
-                                    <svg
-                                        className="h-8 w-8 text-gray-400"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-                                        />
-                                    </svg>
-                                }
-                                href={route('projects.index')}
-                            />
-                        </motion.div>
-
-
-                        <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            <DashboardCard
-                                title="Reports"
-                                description="View reports of your work"
-                                icon={
-                                    <svg
-                                        className="h-8 w-8 text-gray-400"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                                        />
-                                    </svg>
-                                }
-                                href={route('reports.index')}
-                            />
-                        </motion.div>
-
-                        <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            <DashboardCard
-                                title="Tech Dev"
-                                description="View your task technical dev"
-                                icon={
-                                    <svg
-                                        className="h-8 w-8 text-gray-400"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-                                        />
-                                    </svg>
-                                }
-                                href={route('tech-dev.index')}
-                            />
-                        </motion.div>
+                    {/* ── Left column (2/3) ── */}
+                    <div className="lg:col-span-2 flex flex-col gap-6">
+                        <CurrentPeriodCard currentPeriod={currentPeriod} fadeUp={fadeUp} />
+                        <TodayTaskList currentPeriod={currentPeriod} todayTasks={todayTasks} fadeUp={fadeUp} />
                     </div>
 
-                    <WelcomeMessage
-                        title="Welcome to Task Manager! 👋"
-                        description="Get started by creating your first period. A period represents a time frame (like a sprint or month) where you can organize and track your tasks."
-                        ctaText="Go to Last Periods"
-                        ctaHref={route('periods.last')}
-                    />
+                    {/* ── Right column (1/3) ── */}
+                    <div className="flex flex-col gap-6">
+                        <CompletionTrend pastPeriods={pastPeriods} fadeUp={fadeUp} />
+                        <QuickLinks fadeUp={fadeUp} />
+                        <CopyCommandCard fadeUp={fadeUp} />
+                    </div>
                 </div>
             </div>
         </AuthenticatedLayout>
