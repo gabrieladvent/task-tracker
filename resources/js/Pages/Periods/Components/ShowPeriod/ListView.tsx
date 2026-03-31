@@ -55,6 +55,7 @@ function getProgressColor(pct: number): string {
 
 export default function ListView({ tasksByDate, onAddTask, onTaskClick }: ListViewProps) {
     const today = useMemo(() => new Date().toISOString().split('T')[0], []);
+    const [showTodayChangesOnly, setShowTodayChangesOnly] = useState(false);
 
     const [collapsedDates, setCollapsedDates] = useState<Set<string>>(() => {
         const s = new Set<string>();
@@ -180,18 +181,38 @@ export default function ListView({ tasksByDate, onAddTask, onTaskClick }: ListVi
                                     </span>
                                 </div>
 
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); onAddTask(g.date); }}
-                                    className="flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-                                >
-                                    <Plus size={13} />
-                                    Add task
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    {isToday && (
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setShowTodayChangesOnly(prev => !prev); }}
+                                            className={`flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${showTodayChangesOnly
+                                                ? 'border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                                                : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-gray-700 dark:hover:text-gray-200'
+                                                }`}
+                                        >
+                                            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                            {showTodayChangesOnly ? 'All tasks' : "Today's changes"}
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onAddTask(g.date); }}
+                                        className="flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+                                    >
+                                        <Plus size={13} />
+                                        Add task
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Task rows */}
                             <div>
-                                {g.tasks.map((task: any, ti: number) => (
+                                {(isToday && showTodayChangesOnly
+                                    ? g.tasks.filter((t: any) => !t.is_carry_over || t.is_status_changed_today || t.is_new_today)
+                                    : g.tasks
+                                ).map((task: any, ti: number) => (
                                     <motion.div
                                         key={task.id}
                                         initial={{ opacity: 0 }}
