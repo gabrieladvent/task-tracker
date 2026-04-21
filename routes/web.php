@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NoteController;
 use App\Http\Controllers\PeriodController;
 use App\Http\Controllers\PeriodReportController;
 use App\Http\Controllers\ProfileController;
@@ -65,6 +66,23 @@ Route::middleware('auth')->group(function () {
         Route::put('/{techDevTask}', [TechDevTaskController::class, 'update'])->name('update');
         Route::delete('/{techDevTask}', [TechDevTaskController::class, 'destroy'])->name('destroy');
         Route::post('/{techDevTask}/move-to-task', [TechDevTaskController::class, 'moveToTask'])->name('move-to-task');
+    });
+
+    Route::prefix('notes')->name('notes.')->group(function () {
+        Route::get('/', [NoteController::class, 'index'])->name('index');
+        Route::post('/', [NoteController::class, 'store'])->name('store');
+        Route::patch('/{note}', [NoteController::class, 'update'])->name('update');
+        Route::delete('/{note}', [NoteController::class, 'destroy'])->name('destroy');
+
+        Route::patch('/{note}/pin', [NoteController::class, 'togglePin'])->name('pin');
+        Route::patch('/{note}/archive', [NoteController::class, 'archive'])->name('archive');
+        Route::patch('/{note}/unarchive', [NoteController::class, 'unarchive'])->name('unarchive');
+
+        Route::get('/archived', [NoteController::class, 'archived'])->name('archived');
+
+        Route::get('/trash', [NoteController::class, 'trash'])->name('trash');
+        Route::patch('/{id}/restore', [NoteController::class, 'restore'])->name('restore');
+        Route::delete('/{note}/force', [NoteController::class, 'forceDestroy'])->name('force-destroy');
     });
 });
 
