@@ -19,7 +19,6 @@ class Task extends Model
         'parent_task_id',
         'project_id',
         'task_date',
-        'end_date',
         'title',
         'description',
         'notes',
@@ -32,7 +31,6 @@ class Task extends Model
 
     protected $casts = [
         'task_date' => 'date',
-        'end_date' => 'date',
         'status' => StatusEnum::class,
         'priority' => PriorityEnum::class,
         'status_changed_at' => 'datetime',
@@ -45,16 +43,6 @@ class Task extends Model
                 $task->status_changed_at = now();
             }
         });
-    }
-
-    public function scopeActiveOnDate($query, string $date)
-    {
-        return $query
-            ->whereDate('task_date', '<=', $date)
-            ->where(function ($subQuery) use ($date) {
-                $subQuery->whereNull('end_date')
-                    ->orWhereDate('end_date', '>=', $date);
-            });
     }
 
     public function period(): BelongsTo

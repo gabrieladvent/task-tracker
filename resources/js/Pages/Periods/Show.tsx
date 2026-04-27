@@ -33,7 +33,6 @@ export default function ShowPeriod({ period, tasksByDate, calendarData, boardDat
             notes: '',
             link_pull_request: '',
             task_date: date,
-            end_date: null,
             project: null
         };
 
