@@ -25,7 +25,7 @@ class CopyIncompleteTasks extends Command
             ? Carbon::parse($this->option('from-date'))
             : Carbon::yesterday();
 
-        $this->info("Extending incomplete tasks from {$fromDate->format('Y-m-d')} to {$targetDate->format('Y-m-d')}");
+        $this->info("Copying incomplete tasks from {$fromDate->format('Y-m-d')} to {$targetDate->format('Y-m-d')}");
 
         $targetPeriod = Period::whereDate('start_date', '<=', $targetDate)
             ->whereDate('end_date', '>=', $targetDate)
@@ -37,9 +37,9 @@ class CopyIncompleteTasks extends Command
             return Command::FAILURE;
         }
 
-        $this->info("Target period: {$targetPeriod->name}");
+        $this->info("Target period: {$targetPeriod->name} ({$targetPeriod->start_date} to {$targetPeriod->end_date})");
 
-        $incompleteTasks = Task::activeOnDate($fromDate->format('Y-m-d'))
+        $incompleteTasks = Task::whereDate('task_date', $fromDate->format('Y-m-d'))
             ->whereNotIn('status', ['done', 'cancelled', 'on_hold'])
             ->get();
 
@@ -49,20 +49,39 @@ class CopyIncompleteTasks extends Command
             return Command::SUCCESS;
         }
 
-        $updatedCount = 0;
+        $copiedCount = 0;
 
         foreach ($incompleteTasks as $task) {
-            $task->update([
-                'end_date' => $targetDate->format('Y-m-d'),
+            $existingTask = Task::whereDate('task_date', $targetDate->format('Y-m-d'))
+                ->where('title', $task->title)
+                ->where('period_id', $targetPeriod->id)
+                ->first();
+
+            if ($existingTask) {
+                $this->warn("Task '{$task->title}' already exists for {$targetDate->format('Y-m-d')}. Skipping.");
+
+                continue;
+            }
+
+            Task::create([
                 'period_id' => $targetPeriod->id,
+                'project_id' => $task->project_id,
+                'parent_task_id' => $task->parent_task_id ?? $task->id,
+                'task_date' => $targetDate->format('Y-m-d'),
+                'title' => $task->title,
+                'description' => $task->description,
+                'status' => $task->status,
+                'priority' => $task->priority,
+                'story_points' => $task->story_points,
+                'notes' => $task->notes,
+                'link_pull_request' => $task->link_pull_request,
             ]);
 
-            $updatedCount++;
-
-            $this->info("Extended: {$task->title}");
+            $copiedCount++;
+            $this->info("Copied: {$task->title}");
         }
 
-        $this->info("Successfully extended {$updatedCount} task(s) to {$targetDate->format('Y-m-d')}.");
+        $this->info("Successfully copied {$copiedCount} task(s) to period '{$targetPeriod->name}'.");
 
         return Command::SUCCESS;
     }

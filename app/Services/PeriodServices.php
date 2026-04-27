@@ -122,85 +122,52 @@ class PeriodServices
         ];
     }
 
-    private function resolveTaskFlags(object $task, ?string $date = null): array
+    private function resolveTaskFlags(object $task): array
     {
-        $dateCarbon = Carbon::parse($date);
+        $today = Carbon::today();
 
-        $createdDate = Carbon::parse($task->created_at)->startOfDay();
+        $createdToday = Carbon::parse($task->created_at)->isToday();
 
-        $taskStart = $task->task_date->copy()->startOfDay();
-
-        $isNewToday = $createdDate->eq($dateCarbon->copy()->startOfDay())
-            && $taskStart->eq($dateCarbon->copy()->startOfDay())
-            && $task->parent_task_id === null;
-
-        $isCarryOver = $taskStart->lt($dateCarbon->copy()->startOfDay());
+        $isCarryOver = $task->parent_task_id !== null;
 
         return [
-            'is_new_today' => $isNewToday,
-            'is_carry_over' => $isCarryOver,
+            'is_new_today' => $createdToday && ! $isCarryOver,
+
+            'is_carry_over' => $createdToday && $isCarryOver,
+
             'is_status_changed_today' => $task->status_changed_at !== null
-                && Carbon::parse($task->status_changed_at)->startOfDay()->eq($dateCarbon->copy()->startOfDay()),
+                && Carbon::parse($task->status_changed_at)->isToday(),
         ];
     }
 
     private function getTasksGroupedByDate(Period $period): Collection
     {
-        $start = $period->start_date->copy();
-
-        $end = $period->end_date->copy();
-
-        $tasks = $period->tasks()
+        return $period->tasks()
             ->with('project:id,name')
-            ->get();
-
-        $dateRange = collect();
-
-        $current = $start->copy();
-
-        while ($current->lte($end)) {
-            $dateRange->push($current->format('Y-m-d'));
-
-            $current->addDay();
-        }
-
-        return $dateRange
-            ->map(function ($date) use ($tasks) {
-                $activeTasks = $tasks->filter(function ($task) use ($date) {
-                    $taskDate = $task->task_date->format('Y-m-d');
-                    $endDate = $task->end_date ? $task->end_date->format('Y-m-d') : $taskDate;
-
-                    return $taskDate <= $date && $endDate >= $date;
-                });
-
-                if ($activeTasks->isEmpty()) {
-                    return null;
-                }
-
-                return [
-                    'date' => $date,
-                    'day_name' => Carbon::parse($date)->format('l'),
-                    'formatted_date' => Carbon::parse($date)->format('d M Y'),
-                    'tasks' => $activeTasks
-                        ->sortBy(fn ($task) => $task->status->sortOrder())
-                        ->map(fn ($task) => array_merge([
-                            'id' => $task->id,
-                            'title' => $task->title,
-                            'description' => $task->description,
-                            'link_pull_request' => $task->link_pull_request,
-                            'notes' => $task->notes,
-                            'status' => $task->status->value,
-                            'priority' => $task->priority->value,
-                            'story_points' => $task->story_points,
-                            'project_id' => $task->project_id,
-                            'project' => $task->project?->name,
-                            'task_date' => $task->task_date->format('Y-m-d'),
-                            'end_date' => $task->end_date?->format('Y-m-d'),
-                        ], $this->resolveTaskFlags($task, $date)))
-                        ->values(),
-                ];
-            })
-            ->filter()
+            ->byDate()
+            ->get()
+            ->groupBy(fn ($task) => $task->task_date->format('Y-m-d'))
+            ->map(fn ($tasks, $date) => [
+                'date' => $date,
+                'day_name' => Carbon::parse($date)->format('l'),
+                'formatted_date' => Carbon::parse($date)->format('d M Y'),
+                'tasks' => $tasks
+                    ->sortBy(fn ($task) => $task->status->sortOrder())
+                    ->map(fn ($task) => array_merge([
+                        'id' => $task->id,
+                        'title' => $task->title,
+                        'description' => $task->description,
+                        'link_pull_request' => $task->link_pull_request,
+                        'notes' => $task->notes,
+                        'status' => $task->status->value,
+                        'priority' => $task->priority->value,
+                        'story_points' => $task->story_points,
+                        'project_id' => $task->project_id,
+                        'project' => $task->project?->name,
+                        'task_date' => $task->task_date->format('Y-m-d'),
+                    ], $this->resolveTaskFlags($task)))
+                    ->values(),
+            ])
             ->values();
     }
 
@@ -241,76 +208,47 @@ class PeriodServices
     {
         $tasks = $period->tasks()
             ->with('project:id,name')
-            ->select([
-                'id',
-                'title',
-                'status',
-                'priority',
-                'story_points',
-                'project_id',
-                'description',
-                'link_pull_request',
-                'notes',
-                'task_date',
-                'end_date',
-                'parent_task_id',
-                'created_at',
-                'status_changed_at',
-            ])
+            ->select(['id', 'title', 'status', 'priority', 'story_points', 'project_id', 'description', 'link_pull_request', 'notes', 'task_date', 'parent_task_id', 'created_at', 'status_changed_at'])
             ->orderBy('task_date')
             ->orderBy('created_at')
             ->get();
 
-        $start = $period->start_date->copy();
+        $tasksByDate = $tasks->groupBy(fn ($task) => $task->task_date->format('Y-m-d'));
 
-        $end = $period->end_date->copy();
+        $taskCounts = $tasksByDate->map(function ($dateTasks) {
+            $completed = 0;
 
-        $taskCounts = collect();
-
-        $formattedTasks = collect();
-
-        $current = $start->copy();
-
-        while ($current->lte($end)) {
-            $dateStr = $current->format('Y-m-d');
-
-            $activeTasks = $tasks->filter(function ($task) use ($dateStr) {
-                $taskDate = $task->task_date->format('Y-m-d');
-                $endDate = $task->end_date ? $task->end_date->format('Y-m-d') : $taskDate;
-
-                return $taskDate <= $dateStr && $endDate >= $dateStr;
-            });
-
-            if ($activeTasks->isNotEmpty()) {
-                $completed = $activeTasks->filter(fn ($t) => $t->status->value === 'done')->count();
-
-                $taskCounts[$dateStr] = [
-                    'count' => $activeTasks->count(),
-                    'completed' => $completed,
-                ];
-
-                $formattedTasks[$dateStr] = $activeTasks
-                    ->sortBy(fn ($t) => $t->status->sortOrder())
-                    ->map(fn ($task) => array_merge([
-                        'id' => $task->id,
-                        'title' => $task->title,
-                        'status' => $task->status->value,
-                        'priority' => $task->priority->value,
-                        'story_points' => $task->story_points,
-                        'project' => $task->project?->name,
-                        'project_id' => $task->project_id,
-                        'description' => $task->description,
-                        'link_pull_request' => $task->link_pull_request,
-                        'notes' => $task->notes,
-                        'task_date' => $task->task_date->format('Y-m-d'),
-                        'end_date' => $task->end_date?->format('Y-m-d'),
-                    ], $this->resolveTaskFlags($task, $dateStr)))
-                    ->values()
-                    ->toArray();
+            foreach ($dateTasks as $task) {
+                if ($task->status->value === 'done') {
+                    $completed++;
+                }
             }
 
-            $current->addDay();
-        }
+            return [
+                'count' => $dateTasks->count(),
+                'completed' => $completed,
+            ];
+        });
+
+        $formattedTasks = $tasksByDate->map(function ($dateTasks) {
+            return $dateTasks
+                ->sortBy(fn ($task) => $task->status->sortOrder())
+                ->map(fn ($task) => array_merge([
+                    'id' => $task->id,
+                    'title' => $task->title,
+                    'status' => $task->status->value,
+                    'priority' => $task->priority->value,
+                    'story_points' => $task->story_points,
+                    'project' => $task->project?->name,
+                    'project_id' => $task->project_id,
+                    'description' => $task->description,
+                    'link_pull_request' => $task->link_pull_request,
+                    'notes' => $task->notes,
+                    'task_date' => $task->task_date->format('Y-m-d'),
+                ], $this->resolveTaskFlags($task)))
+                ->values()
+                ->toArray();
+        });
 
         return [
             'counts' => $taskCounts,
