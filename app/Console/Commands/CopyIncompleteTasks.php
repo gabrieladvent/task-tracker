@@ -40,7 +40,7 @@ class CopyIncompleteTasks extends Command
         $this->info("Target period: {$targetPeriod->name} ({$targetPeriod->start_date} to {$targetPeriod->end_date})");
 
         $incompleteTasks = Task::whereDate('task_date', $fromDate->format('Y-m-d'))
-            ->whereNotIn('status', ['done', 'cancelled', 'on_hold'])
+            ->whereNotIn('status', ['done', 'cancelled'])
             ->get();
 
         if ($incompleteTasks->isEmpty()) {
