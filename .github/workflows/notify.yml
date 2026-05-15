@@ -1,4 +1,4 @@
-name: Notify
+name: Notify Task Tracker
 
 on:
   pull_request:
@@ -33,7 +33,6 @@ jobs:
               ref: context.payload.pull_request.head.sha
             });
 
-            // Filter workflow yang relevan DAN exclude Notify
             const workflows = checkRuns.check_runs.filter(run =>
               ['Test', 'Lint', 'Build'].some(name => run.name.includes(name)) &&
               !run.name.includes('telegram') &&
@@ -58,28 +57,98 @@ jobs:
             core.setOutput('emoji', emoji);
             core.setOutput('count', workflows.length);
 
-      - name: Set PR status
-        id: pr_status
+      - name: Build message per event
+        id: msg
         run: |
-          if [ "${{ github.event.pull_request.merged }}" == "true" ]; then
-            echo "action=merged" >> $GITHUB_OUTPUT
+          ACTION="${{ github.event.action }}"
+          MERGED="${{ github.event.pull_request.merged }}"
+          PR_NUM="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          AUTHOR="${{ github.event.pull_request.user.login }}"
+          HEAD="${{ github.event.pull_request.head.ref }}"
+          BASE="${{ github.event.pull_request.base.ref }}"
+          COMMITS="${{ github.event.pull_request.commits }}"
+          REPO="${{ github.repository }}"
+          CHECKS="${{ steps.results.outputs.count }}"
+          STATUS="${{ steps.results.outputs.conclusion }}"
+          CHECK_EMOJI="${{ steps.results.outputs.emoji }}"
+
+          if [ "$MERGED" == "true" ]; then
+            MESSAGE="🎉 <b>PR Merged in Task Tracker!</b>
+
+            🔀 <b>PR #${PR_NUM}</b> — ${PR_TITLE}
+
+            👤 Author    : @${AUTHOR}
+            🌿 Branch    : ${HEAD} → ${BASE}
+            📦 Repo      : ${REPO}
+            🔢 Commits   : ${COMMITS} commit(s)
+            ${CHECK_EMOJI} CI Status  : ${STATUS} (${CHECKS} checks)
+
+            ✨ Changes have landed on <code>${BASE}</code>!
+            🔗 <a href=\"${PR_URL}\">View Pull Request</a>"
+
+          elif [ "$ACTION" == "opened" ]; then
+            MESSAGE="🚀 <b>New PR Opened in Task Tracker!</b>
+
+            📝 <b>PR #${PR_NUM}</b> — ${PR_TITLE}
+
+            👤 Author    : @${AUTHOR}
+            🌿 Branch    : ${HEAD} → ${BASE}
+            📦 Repo      : ${REPO}
+            🔢 Commits   : ${COMMITS} commit(s)
+
+            👀 Review needed — let's go!
+            🔗 <a href=\"${PR_URL}\">View Pull Request</a>"
+
+          elif [ "$ACTION" == "synchronize" ]; then
+            MESSAGE="🔄 <b>PR Updated in Task Tracker!</b>
+
+            📝 <b>PR #${PR_NUM}</b> — ${PR_TITLE}
+
+            👤 Author    : @${AUTHOR}
+            🌿 Branch    : ${HEAD} → ${BASE}
+            📦 Repo      : ${REPO}
+            🔢 Commits   : ${COMMITS} commit(s)
+            ${CHECK_EMOJI} CI Status  : ${STATUS} (${CHECKS} checks)
+
+            ⚡ New push detected, checks are running...
+            🔗 <a href=\"${PR_URL}\">View Pull Request</a>"
+
+          elif [ "$ACTION" == "reopened" ]; then
+            MESSAGE="♻️ <b>PR Reopened in Task Tracker!</b>
+
+            📝 <b>PR #${PR_NUM}</b> — ${PR_TITLE}
+
+            👤 Author    : @${AUTHOR}
+            🌿 Branch    : ${HEAD} → ${BASE}
+            📦 Repo      : ${REPO}
+            🔢 Commits   : ${COMMITS} commit(s)
+
+            🙌 Back in action!
+            🔗 <a href=\"${PR_URL}\">View Pull Request</a>"
+
           else
-            echo "action=${{ github.event.action }}" >> $GITHUB_OUTPUT
+            MESSAGE="🚫 <b>PR Closed in Task Tracker!</b>
+
+            📝 <b>PR #${PR_NUM}</b> — ${PR_TITLE}
+
+            👤 Author    : @${AUTHOR}
+            🌿 Branch    : ${HEAD} → ${BASE}
+            📦 Repo      : ${REPO}
+
+            ❌ PR ditutup tanpa di-merge.
+            🔗 <a href=\"${PR_URL}\">View Pull Request</a>"
           fi
 
-      - uses: appleboy/telegram-action@master
+          echo "text<<EOF" >> $GITHUB_OUTPUT
+          echo "$MESSAGE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Send Telegram Notification
+        uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           format: html
-          message: |
-            ${{ steps.results.outputs.emoji }} PR #${{ github.event.pull_request.number }} - ${{ steps.pr_status.outputs.action }}
-
-            <b>Title:</b> ${{ github.event.pull_request.title }}
-            <b>Status:</b> ${{ steps.results.outputs.conclusion }}
-            <b>Checks:</b> ${{ steps.results.outputs.count }} workflows completed
-            <b>Repository:</b> ${{ github.repository }}
-            <b>Branch:</b> ${{ github.event.pull_request.head.ref }} → ${{ github.event.pull_request.base.ref }}
-            <b>Author:</b> @${{ github.event.pull_request.user.login }}
-
-            <a href="${{ github.event.pull_request.html_url }}">View PR</a>
+          message: ${{ steps.msg.outputs.text }}
