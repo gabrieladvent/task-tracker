@@ -9,6 +9,7 @@ import { TodayTaskList } from './Components/TodayTaskList';
 import { CompletionTrend } from './Components/CompletionTrend';
 import { QuickLinks } from './Components/QuickLinks';
 import { CopyCommandCard } from './Components/CopyCommandCard';
+import { NotesReminder } from './Components/NotesReminder';
 
 interface Props {
     currentPeriod: PeriodStats | null;
@@ -49,7 +50,8 @@ export default function Dashboard({ currentPeriod, todayTasks, pastPeriods, toda
                     {/* ── Right column (1/3) ── */}
                     <div className="flex flex-col gap-6">
                         <CompletionTrend pastPeriods={pastPeriods} fadeUp={fadeUp} />
-                        <QuickLinks fadeUp={fadeUp} />
+                        <NotesReminder fadeUp={fadeUp} />
+                        {/* <QuickLinks fadeUp={fadeUp} /> */}
                         <CopyCommandCard fadeUp={fadeUp} />
                     </div>
                 </div>

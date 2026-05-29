@@ -6,6 +6,7 @@ import { PropsWithChildren, ReactNode, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import ThemeToggle from '@/Components/ThemeToggle';
+import NotesReminderWidget from '@/Components/Notes/NotesReminderWidget';
 
 function NavBadge({ count }: { count: number }) {
     if (!count || count === 0) return null;
@@ -29,6 +30,7 @@ const navItems = (badges: any) => [
     { label: 'Projects', route: 'projects.index', match: 'projects.*', badge: badges?.projects },
     { label: 'Reports', route: 'reports.index', match: 'reports.*', badge: badges?.reports },
     { label: 'Tech Dev', route: 'tech-dev.index', match: 'tech-dev.*', badge: badges?.techDev },
+    { label: 'Notes', route: 'notes.index', match: 'notes.*', badge: badges?.notes },
 ];
 
 export default function Authenticated({
@@ -289,6 +291,9 @@ export default function Authenticated({
                     {children}
                 </div>
             </main>
+
+            {/* ── GLOBAL NOTES REMINDER ── */}
+            <NotesReminderWidget />
 
             {/* ── SCROLL TO TOP ── */}
             <AnimatePresence>
