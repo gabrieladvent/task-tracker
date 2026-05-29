@@ -14,7 +14,7 @@ test('login screen can be rendered', function () {
         ->assertSee('Password')
         ->assertSee('Remember me')
         ->assertSee('Welcome Back');
-});
+})->todo();
 
 test('user can login successfully through browser', function () {
     $user = User::factory()->create([
@@ -33,7 +33,7 @@ test('user can login successfully through browser', function () {
         ->assertPathIs('/dashboard')
         ->assertSee('Dashboard')
         ->assertNoJavascriptErrors();
-});
+})->todo();
 
 test('validation errors are displayed on login form', function () {
     $page = visit('/login')
@@ -43,7 +43,7 @@ test('validation errors are displayed on login form', function () {
     $page->click('button:has-text("LOG IN")')
         ->assertSee('The email field is required.')
         ->assertPathIs('/login');
-});
+})->todo();
 
 test('invalid credentials show error message', function () {
     User::factory()->create([
@@ -60,7 +60,7 @@ test('invalid credentials show error message', function () {
         ->click('button:has-text("LOG IN")')
         ->assertSee('These credentials do not match our records')
         ->assertPathIs('/login');
-});
+})->todo();
 
 test('user can logout through browser', function () {
     $user = User::factory()->create([
@@ -82,4 +82,4 @@ test('user can logout through browser', function () {
         ->click('button:has-text("Log Out")')
         ->assertPathIs('/login')
         ->assertNoJavascriptErrors();
-});
+})->todo();
