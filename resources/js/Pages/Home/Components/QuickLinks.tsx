@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { CalendarDays, CalendarRange, FolderOpen, BarChart2, Wrench } from 'lucide-react';
+import { CalendarDays, CalendarRange, FolderOpen, BarChart2, Wrench, StickyNote } from 'lucide-react';
 
 interface Props {
     fadeUp: (delay?: number) => object;
@@ -12,6 +12,7 @@ const QUICK_LINKS = [
     { label: 'Projects', routeName: 'projects.index', icon: FolderOpen },
     { label: 'Reports', routeName: 'reports.index', icon: BarChart2 },
     { label: 'Tech Dev', routeName: 'tech-dev.index', icon: Wrench },
+    { label: 'Notes', routeName: 'notes.index', icon: StickyNote },
 ] as const;
 
 export function QuickLinks({ fadeUp }: Props) {

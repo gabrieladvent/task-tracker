@@ -55,7 +55,16 @@ class HandleInertiaRequests extends Middleware
                     now()->addMinutes(10),
                     fn () => \App\Models\TechDevTask::count()
                 ),
+                'notes' => \App\Models\Note::forUser($request->user()->id)->active()->count(),
             ] : [],
+            'reminders' => $request->user()
+                ? \App\Models\Note::forUser($request->user()->id)
+                    ->active()
+                    ->pinned()
+                    ->orderByDesc('updated_at')
+                    ->limit(10)
+                    ->get(['id', 'title', 'content', 'color', 'updated_at'])
+                : [],
             'app' => [
                 'env' => app()->environment(),
             ],
