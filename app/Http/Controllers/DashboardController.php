@@ -26,9 +26,7 @@ class DashboardController extends Controller
 
         if ($currentPeriod) {
 
-            $unique = $currentPeriod->tasks
-                ->groupBy(fn ($task) => $task->parent_task_id ?? $task->id)
-                ->map(fn ($version) => $version->sortByDesc('task_date')->first());
+            $unique = Task::latestVersions($currentPeriod->tasks);
 
             $total = $unique->count();
 
@@ -74,9 +72,7 @@ class DashboardController extends Controller
             ->limit(5)
             ->get()
             ->map(function ($period) {
-                $unique = $period->tasks
-                    ->groupBy(fn ($t) => $t->parent_task_id ?? $t->id)
-                    ->map(fn ($v) => $v->sortByDesc('task_date')->first());
+                $unique = Task::latestVersions($period->tasks);
 
                 $total = $unique->count();
                 $done = $unique->where('status.value', 'done')->count();

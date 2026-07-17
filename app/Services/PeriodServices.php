@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enum\StatusEnum;
 use App\Models\Period;
+use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -15,9 +16,7 @@ class PeriodServices
             ->orderByDesc('start_date')
             ->get()
             ->map(function ($period) {
-                $uniqueTasks = $period->tasks
-                    ->groupBy(fn ($task) => $task->parent_task_id ?? $task->id)
-                    ->map(fn ($versions) => $versions->sortByDesc('task_date')->first());
+                $uniqueTasks = Task::latestVersions($period->tasks);
 
                 return [
                     'id' => $period->id,
@@ -34,13 +33,14 @@ class PeriodServices
 
     public function getPeriodDetails(Period $period): array
     {
-        $period->loadCount([
-            'tasks',
-            'tasks as completed_tasks_count' => fn ($query) => $query->where('status', 'done'),
-        ]);
+        $uniqueTasks = Task::latestVersions(
+            $period->tasks()
+                ->select(['id', 'period_id', 'parent_task_id', 'status', 'task_date'])
+                ->get()
+        );
 
         return [
-            'period' => $this->formatPeriodBasicInfo($period),
+            'period' => $this->formatPeriodBasicInfo($period, $uniqueTasks),
             'tasksByDate' => $this->getTasksGroupedByDate($period),
             'calendarData' => $this->generateCalendarData($period),
             'boardData' => $this->getBoardData($period),
@@ -69,9 +69,7 @@ class PeriodServices
             ->orderBy('task_date')
             ->get();
 
-        $uniqueTasks = $tasks
-            ->groupBy(fn ($task) => $task->parent_task_id ?? $task->id)
-            ->map(fn ($versions) => $versions->sortByDesc('task_date')->first());
+        $uniqueTasks = Task::latestVersions($tasks);
 
         $tasksByStatus = $uniqueTasks->groupBy(fn ($task) => $task->status->value);
 
@@ -110,15 +108,15 @@ class PeriodServices
         return ['columns' => $columns];
     }
 
-    private function formatPeriodBasicInfo(Period $period): array
+    private function formatPeriodBasicInfo(Period $period, Collection $uniqueTasks): array
     {
         return [
             'id' => $period->id,
             'name' => $period->display_name,
             'start_date' => $period->start_date->format('Y-m-d'),
             'end_date' => $period->end_date->format('Y-m-d'),
-            'tasks_count' => $period->tasks_count,
-            'completed_tasks_count' => $period->completed_tasks_count,
+            'tasks_count' => $uniqueTasks->count(),
+            'completed_tasks_count' => $uniqueTasks->where('status.value', 'done')->count(),
         ];
     }
 
