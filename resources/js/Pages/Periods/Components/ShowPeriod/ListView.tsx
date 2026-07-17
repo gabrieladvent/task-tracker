@@ -10,7 +10,7 @@ interface ListViewProps {
     onTaskClick: (task: CalendarTask) => void;
 }
 
-function ActivityBadge({ task }: { task: any }) {
+function ActivityBadge({ task }: { task: CalendarTask }) {
     if (task.is_status_changed_today) return (
         <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 text-xs font-medium text-blue-700 dark:text-blue-400">
             <svg className="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,7 +39,7 @@ function ActivityBadge({ task }: { task: any }) {
     return null;
 }
 
-function getTaskRowStyle(task: any): string {
+function getTaskRowStyle(task: CalendarTask): string {
     const base = 'flex items-center gap-4 px-5 py-3.5 border-b border-gray-50 dark:border-slate-700/50 last:border-none cursor-pointer transition-colors border-l-2';
     if (task.is_status_changed_today) return `${base} border-l-blue-400 bg-blue-50/40 dark:bg-blue-950/20 hover:bg-blue-50/70 dark:hover:bg-blue-950/30`;
     if (task.is_new_today) return `${base} border-l-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20 hover:bg-emerald-50/70 dark:hover:bg-emerald-950/30`;
@@ -97,7 +97,7 @@ export default function ListView({ tasksByDate, onAddTask, onTaskClick }: ListVi
                 <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                     <AnimatePresence>
                         {collapsed.map((g, i) => {
-                            const done = g.tasks.filter((t: any) => t.status === 'done').length;
+                            const done = g.tasks.filter((t) => t.status === 'done').length;
                             const total = g.tasks.length;
                             const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
@@ -210,16 +210,16 @@ export default function ListView({ tasksByDate, onAddTask, onTaskClick }: ListVi
                             {/* Task rows */}
                             <div>
                                 {(isToday && showTodayChangesOnly
-                                    ? g.tasks.filter((t: any) => !t.is_carry_over || t.is_status_changed_today || t.is_new_today)
+                                    ? g.tasks.filter((t) => !t.is_carry_over || t.is_status_changed_today || t.is_new_today)
                                     : g.tasks
-                                ).map((task: any, ti: number) => (
+                                ).map((task, ti) => (
                                     <motion.div
                                         key={task.id}
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         transition={{ delay: ti * 0.03 }}
                                         className={getTaskRowStyle(task)}
-                                        onClick={() => onTaskClick(task as CalendarTask)}
+                                        onClick={() => onTaskClick(task)}
                                     >
                                         {/* Status dot */}
                                         <span className={`h-3 w-3 rounded-full shrink-0 ${getStatusColor(task.status)}`} />

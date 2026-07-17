@@ -9,6 +9,7 @@ import SearchBar from '@/Components/SearchBar';
 import PerPageSelector from '@/Components/PerPageSelector';
 import Pagination from '@/Components/Pagination';
 import { Project } from '@/Pages/Project/types/Project';
+import { PaginationLink } from '@/types';
 
 interface ProjectCardData {
     id: string;
@@ -21,7 +22,7 @@ interface ProjectCardData {
 interface Props {
     projects: {
         data: ProjectCardData[];
-        links: any[];
+        links: PaginationLink[];
         current_page: number;
         last_page: number;
         per_page: number;

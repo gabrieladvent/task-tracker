@@ -2,6 +2,7 @@ import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
 import { Props, CalendarTask } from '@/Pages/Periods/types/period';
+import { PageProps } from '@/types';
 import CalendarView from '@/Pages/Periods/Components/ShowPeriod/CalendarView';
 import ListView from '@/Pages/Periods/Components/ShowPeriod/ListView';
 import ViewToggle from '@/Pages/Periods/Components/ShowPeriod/ViewToggle';
@@ -18,8 +19,8 @@ export default function ShowPeriod({ period, tasksByDate, calendarData, boardDat
     const [isNewTask, setIsNewTask] = useState(false);
     const [showGenerateModal, setShowGenerateModal] = useState(false);
     const [showGenerateTaskModal, setShowGenerateTaskModal] = useState(false);
-    const { app } = usePage().props as any;
-    const isDev = app.env === 'local';
+    const { app } = usePage<PageProps>().props;
+    const isDev = app?.env === 'local';
 
     const openNewTaskModal = (date: string) => {
         const emptyTask: CalendarTask = {

@@ -9,6 +9,7 @@ import SearchBar from '@/Components/SearchBar';
 import PerPageSelector from '@/Components/PerPageSelector';
 import Pagination from '@/Components/Pagination';
 import { TechDevTask } from '@/Pages/TechDev/types/TechDevTask';
+import { PaginationLink } from '@/types';
 
 interface Project {
     id: string;
@@ -19,7 +20,7 @@ interface Project {
 interface Props {
     tasks: {
         data: TechDevTask[];
-        links: any[];
+        links: PaginationLink[];
         current_page: number;
         last_page: number;
         per_page: number;

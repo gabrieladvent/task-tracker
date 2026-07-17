@@ -1,11 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-
-interface PaginationLink {
-    url: string | null;
-    label: string;
-    active: boolean;
-}
+import { PaginationLink } from '@/types';
 
 interface PaginationProps {
     links: PaginationLink[];

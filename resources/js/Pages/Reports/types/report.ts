@@ -7,6 +7,15 @@ export interface Report {
     created_at: string;
 }
 
+export interface ReportListItem extends Report {
+    period?: {
+        id: string;
+        name: string;
+        start_date: string;
+        end_date: string;
+    };
+}
+
 export interface ReportData {
     [projectName: string]: ReportTask[];
 }
