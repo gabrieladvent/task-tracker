@@ -1,7 +1,8 @@
 import ReportCard from './ReportCard';
+import { ReportListItem } from '../types/report';
 
 interface ReportGridProps {
-    reports: any[];
+    reports: ReportListItem[];
     periodId: string;
     showPeriodBadge?: boolean;
 }
@@ -13,7 +14,7 @@ export default function ReportGrid({ reports, periodId, showPeriodBadge = false 
                 <ReportCard
                     key={report.id}
                     report={report}
-                    periodId={showPeriodBadge ? report.period.id : periodId}
+                    periodId={showPeriodBadge ? (report.period?.id ?? periodId) : periodId}
                     index={index}
                     showPeriodBadge={showPeriodBadge}
                 />

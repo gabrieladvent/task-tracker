@@ -12,8 +12,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property \Illuminate\Support\Carbon $start_date
  * @property \Illuminate\Support\Carbon $end_date
  * @property-read int $duration_in_days
- * @property-read int $completed_tasks_count
- * @property-read int $total_tasks_count
  * @property-read string $display_name
  */
 class Period extends Model
@@ -45,16 +43,6 @@ class Period extends Model
     public function getDurationInDaysAttribute(): int
     {
         return $this->start_date->diffInDays($this->end_date) + 1;
-    }
-
-    public function getCompletedTasksCountAttribute(): int
-    {
-        return $this->tasks()->where('status', 'done')->count();
-    }
-
-    public function getTotalTasksCountAttribute(): int
-    {
-        return $this->tasks()->count();
     }
 
     public function scopeCurrent($query)

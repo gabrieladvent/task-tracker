@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Pagination from '@/Components/Pagination';
+import { PaginationLink } from '@/types';
 import ReportHeader from './Components/ReportHeader';
 import ReportFilters from './Components/ReportFilters';
 import ReportGrid from './Components/ReportGrid';
@@ -25,7 +26,7 @@ interface Report {
 interface Props {
     reports: {
         data: Report[];
-        links: any[];
+        links: PaginationLink[];
         current_page: number;
         last_page: number;
         per_page: number;

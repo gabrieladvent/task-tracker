@@ -35,11 +35,17 @@ export interface Project {
     color: string | null;
 }
 
+export interface TaskActivityFlags {
+    is_new_today?: boolean;
+    is_carry_over?: boolean;
+    is_status_changed_today?: boolean;
+}
+
 export interface TasksByDate {
     date: string;
     day_name: string;
     formatted_date: string;
-    tasks: Task[];
+    tasks: CalendarTask[];
 }
 
 export interface CalendarDay {
@@ -63,7 +69,7 @@ export interface PeriodFormData {
     end_date: string | undefined;
 }
 
-export interface CalendarTask {
+export interface CalendarTask extends TaskActivityFlags {
     id: string;
     title: string;
     status: string;

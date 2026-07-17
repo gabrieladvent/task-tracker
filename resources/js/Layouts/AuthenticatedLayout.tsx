@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import ThemeToggle from '@/Components/ThemeToggle';
 import NotesReminderWidget from '@/Components/Notes/NotesReminderWidget';
+import { PageProps, NavBadges } from '@/types';
 
 function NavBadge({ count }: { count: number }) {
     if (!count || count === 0) return null;
@@ -24,7 +25,7 @@ function NavBadge({ count }: { count: number }) {
     );
 }
 
-const navItems = (badges: any) => [
+const navItems = (badges?: NavBadges) => [
     { label: 'Dashboard', route: 'dashboard', match: 'dashboard', badge: null },
     { label: 'Periods', route: 'periods.index', match: 'periods.*', badge: badges?.periods, excludeMatch: 'periods.reports.*' },
     { label: 'Projects', route: 'projects.index', match: 'projects.*', badge: badges?.projects },
@@ -37,8 +38,8 @@ export default function Authenticated({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
-    const user = usePage().props.auth.user;
-    const { badges } = usePage().props as any;
+    const { auth, badges } = usePage<PageProps>().props;
+    const user = auth.user;
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
     const [showScrollTop, setShowScrollTop] = useState(false);
