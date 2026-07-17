@@ -15,6 +15,10 @@
 pest()->extend(Tests\TestCase::class)
     ->in('Feature');
 
+// Extend TestCase untuk Unit folder (butuh app booted untuk casting model)
+pest()->extend(Tests\TestCase::class)
+    ->in('Unit');
+
 // Extend TestCase untuk Browser folder dengan auto group
 pest()->extend(Tests\TestCase::class)
     ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
