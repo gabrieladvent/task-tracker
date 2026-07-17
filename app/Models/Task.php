@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Collection;
 
 class Task extends Model
 {
@@ -68,6 +69,19 @@ class Task extends Model
     public function getOriginalTaskId(): string
     {
         return $this->parent_task_id ?? $this->id;
+    }
+
+    /**
+     * Collapse a collection of tasks to one row per original task, keeping the
+     * most recent carry-over version. Shared by the board, dashboard, period
+     * stats and reports so their counts stay consistent.
+     */
+    public static function latestVersions(Collection $tasks): Collection
+    {
+        return $tasks
+            ->groupBy(fn (Task $task) => $task->getOriginalTaskId())
+            ->map(fn (Collection $versions) => $versions->sortByDesc('task_date')->first())
+            ->values();
     }
 
     public function scopeDone($query)

@@ -6,6 +6,7 @@ use App\Enum\PriorityEnum;
 use App\Enum\StatusEnum;
 use App\Models\Period;
 use App\Models\PeriodReport;
+use App\Models\Task;
 use Carbon\Carbon;
 
 class ReportService
@@ -70,9 +71,7 @@ class ReportService
 
     protected function deduplicateTasks($tasks)
     {
-        return $tasks->groupBy(fn ($task) => $task->getOriginalTaskId())
-            ->map(fn ($versions) => $versions->sortByDesc('task_date')->first())
-            ->values();
+        return Task::latestVersions($tasks);
     }
 
     protected function mergeRecurringTasks($tasks, $period): array
