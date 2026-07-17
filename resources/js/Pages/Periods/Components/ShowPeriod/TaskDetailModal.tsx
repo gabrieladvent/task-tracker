@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { router } from '@inertiajs/react';
+import toast from 'react-hot-toast';
 import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import { CalendarTask } from '@/Pages/Periods/types/period';
 import { getStatusColor, getStatusBadgeColor, getPriorityColor, getPriorityBadgeColor } from '@/Pages/Periods/utils';
@@ -380,7 +381,7 @@ export default function TaskDetailModal({
 
     const handleCreateTask = useCallback(async () => {
         if (!formData.title.trim()) {
-            alert('Please enter a task title');
+            toast.error('Please enter a task title');
             return;
         }
 
@@ -408,7 +409,9 @@ export default function TaskDetailModal({
                     onClose();
                 },
                 onError: (errors) => {
-                    console.log('Validation errors:', errors);
+                    const message =
+                        Object.values(errors)[0] ?? 'Failed to create task. Please try again.';
+                    toast.error(message as string);
                 }
             });
         } catch (error) {
