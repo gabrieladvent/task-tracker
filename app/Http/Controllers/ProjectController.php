@@ -12,7 +12,7 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search', '');
-        $perPage = $request->input('per_page', 12); // Default 12 untuk grid 3/4 kolom
+        $perPage = max(1, min((int) $request->integer('per_page', 12), 100)); // Default 12 untuk grid 3/4 kolom
 
         $projects = Project::query()
             ->when($search, function ($query, $search) {

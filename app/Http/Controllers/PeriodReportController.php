@@ -20,7 +20,7 @@ class PeriodReportController extends Controller
     {
         $search = $request->input('search', '');
 
-        $perPage = $request->input('per_page', 10);
+        $perPage = max(1, min((int) $request->integer('per_page', 10), 100));
 
         $reports = PeriodReport::with('period:id,name,start_date,end_date')
             ->when($search, function ($query, $search) {
@@ -59,7 +59,7 @@ class PeriodReportController extends Controller
     {
         $search = $request->input('search', '');
 
-        $perPage = $request->input('per_page', 10);
+        $perPage = max(1, min((int) $request->integer('per_page', 10), 100));
 
         $reports = PeriodReport::where('period_id', $period->id)
             ->when($search, function ($query, $search) {

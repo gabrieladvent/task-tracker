@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Folder, ArrowRight, Calendar } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useForm, router } from '@inertiajs/react';
+import toast from 'react-hot-toast';
 import { TechDevTask } from '../types/TechDevTask';
 import ConfirmDeleteModal from '@/Components/ConfirmDeleteModal';
 
@@ -91,11 +92,11 @@ export default function TechDevTaskModal({ isOpen, onClose, task, mode, projects
                     onClose();
                     setShowMoveToTask(false);
                 },
-                onError: () => {
-                    console.log('eerorr');
-
-                    setShowMoveToTask(false);
-                }
+                onError: (errors) => {
+                    const message =
+                        Object.values(errors)[0] ?? 'Failed to move task. Please try again.';
+                    toast.error(message as string);
+                },
             });
         }
     };

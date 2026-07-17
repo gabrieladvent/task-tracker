@@ -75,11 +75,6 @@ class Task extends Model
         return $query->where('status', 'done');
     }
 
-    public function scopePending($query)
-    {
-        return $query->where('status', 'pending');
-    }
-
     public function scopeByDate($query)
     {
         return $query->orderBy('task_date', 'asc')->orderBy('created_at', 'asc');

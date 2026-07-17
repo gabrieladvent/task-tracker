@@ -33,6 +33,7 @@ export default function Dashboard({ currentPeriod, todayTasks, pastPeriods, toda
 
     return (
         <AuthenticatedLayout>
+            
             <Head title="Dashboard" />
 
             <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-full">

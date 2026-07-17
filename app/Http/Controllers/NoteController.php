@@ -7,6 +7,7 @@ use App\Models\NoteTag;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -41,7 +42,9 @@ class NoteController extends Controller
             'content' => 'nullable|string',
             'color' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'tag_ids' => 'nullable|array',
-            'tag_ids.*' => 'exists:note_tags,id',
+            'tag_ids.*' => [
+                Rule::exists('note_tags', 'id')->where('user_id', Auth::id()),
+            ],
         ]);
 
         $note = Note::create([
@@ -60,12 +63,16 @@ class NoteController extends Controller
 
     public function update(Request $request, Note $note): RedirectResponse
     {
+        $this->authorize('update', $note);
+
         $validated = $request->validate([
             'title' => 'sometimes|required|string|max:255',
             'content' => 'nullable|string',
             'color' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'tag_ids' => 'nullable|array',
-            'tag_ids.*' => 'exists:note_tags,id',
+            'tag_ids.*' => [
+                Rule::exists('note_tags', 'id')->where('user_id', Auth::id()),
+            ],
         ]);
 
         $note->update(array_filter([
@@ -83,6 +90,8 @@ class NoteController extends Controller
 
     public function togglePin(Note $note): RedirectResponse
     {
+        $this->authorize('update', $note);
+
         $note->update(['is_pinned' => ! $note->is_pinned]);
 
         return back()->with('success', $note->is_pinned ? 'Note disematkan.' : 'Sematan dilepas.');
@@ -90,6 +99,8 @@ class NoteController extends Controller
 
     public function archive(Note $note): RedirectResponse
     {
+        $this->authorize('update', $note);
+
         $note->update(['is_archived' => true, 'is_pinned' => false]);
 
         return back()->with('success', 'Note diarsipkan.');
@@ -97,6 +108,8 @@ class NoteController extends Controller
 
     public function unarchive(Note $note): RedirectResponse
     {
+        $this->authorize('update', $note);
+
         $note->update(['is_archived' => false]);
 
         return back()->with('success', 'Note dipulihkan dari arsip.');
@@ -116,13 +129,17 @@ class NoteController extends Controller
 
     public function destroy(Note $note): RedirectResponse
     {
+        $this->authorize('delete', $note);
+
         $note->delete(); // soft delete
 
         return back()->with('success', 'Note dihapus.');
     }
 
-    public function forceDestroy(Note $note): RedirectResponse
+    public function forceDestroy(string $id): RedirectResponse
     {
+        $note = Note::withTrashed()->forUser(Auth::id())->findOrFail($id);
+
         $note->tags()->detach();
         $note->forceDelete();
 
@@ -140,7 +157,7 @@ class NoteController extends Controller
         return Inertia::render('Notes/Trash', ['notes' => $notes]);
     }
 
-    public function restore(int $id): RedirectResponse
+    public function restore(string $id): RedirectResponse
     {
         $note = Note::onlyTrashed()->forUser(Auth::id())->findOrFail($id);
         $note->restore();

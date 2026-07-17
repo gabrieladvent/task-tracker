@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\PriorityEnum;
+use App\Enum\StatusEnum;
+use App\Models\Period;
 use App\Models\Project;
+use App\Models\Task;
 use App\Models\TechDevTask;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class TechDevTaskController extends Controller
@@ -77,26 +83,34 @@ class TechDevTaskController extends Controller
     {
         $validated = $request->validate([
             'task_date' => 'required|date',
-            'status' => 'nullable|in:todo,in_progress,on_hold,code_review,done,cancelled',
-            'priority' => 'nullable|in:low,medium,high',
+            'status' => ['nullable', Rule::enum(StatusEnum::class)],
+            'priority' => ['nullable', Rule::enum(PriorityEnum::class)],
             'story_points' => 'nullable|integer|min:0|max:100',
         ]);
 
-        $period = \App\Models\Period::current()->first();
+        $period = Period::current()->first();
 
-        $task = \App\Models\Task::create([
-            'period_id' => $period->id,
-            'task_date' => $validated['task_date'],
-            'title' => $techDevTask->title,
-            'description' => $techDevTask->description,
-            'notes' => $techDevTask->notes,
-            'project_id' => $techDevTask->project_id,
-            'status' => $validated['status'] ?? 'todo',
-            'priority' => $validated['priority'] ?? 'medium',
-            'story_points' => $validated['story_points'] ?? null,
-        ]);
+        if (! $period) {
+            return back()->withErrors([
+                'task_date' => 'No active period found for today. Create or activate a period first.',
+            ]);
+        }
 
-        $techDevTask->delete();
+        DB::transaction(function () use ($period, $techDevTask, $validated) {
+            Task::create([
+                'period_id' => $period->id,
+                'task_date' => $validated['task_date'],
+                'title' => $techDevTask->title,
+                'description' => $techDevTask->description,
+                'notes' => $techDevTask->notes,
+                'project_id' => $techDevTask->project_id,
+                'status' => $validated['status'] ?? 'todo',
+                'priority' => $validated['priority'] ?? 'medium',
+                'story_points' => $validated['story_points'] ?? null,
+            ]);
+
+            $techDevTask->delete();
+        });
 
         return back()->with('success', 'Task moved successfully');
     }
