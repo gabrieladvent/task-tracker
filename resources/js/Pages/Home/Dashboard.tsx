@@ -2,11 +2,12 @@ import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { PastPeriod, PeriodStats, TodayTask } from './types/dashboard';
+import { PastPeriod, PeriodStats, ProjectDistribution as Distribution, TodayTask } from './types/dashboard';
 import { DashboardHeader } from './Components/DashboardHeader';
 import { CurrentPeriodCard } from './Components/CurrentPeriodCard';
 import { TodayTaskList } from './Components/TodayTaskList';
 import { CompletionTrend } from './Components/CompletionTrend';
+import { ProjectDistribution } from './Components/Distribution';
 import { QuickLinks } from './Components/QuickLinks';
 import { CopyCommandCard } from './Components/CopyCommandCard';
 import { NotesReminder } from './Components/NotesReminder';
@@ -15,6 +16,7 @@ interface Props {
     currentPeriod: PeriodStats | null;
     todayTasks: TodayTask[];
     pastPeriods: PastPeriod[];
+    projectDistribution: Distribution;
     todayStr: string;
 }
 
@@ -26,7 +28,7 @@ function fadeUp(delay = 0) {
     };
 }
 
-export default function Dashboard({ currentPeriod, todayTasks, pastPeriods, todayStr }: Props) {
+export default function Dashboard({ currentPeriod, todayTasks, pastPeriods, projectDistribution, todayStr }: Props) {
     const today = new Date(todayStr);
     const dayName = today.toLocaleString('default', { weekday: 'long' });
     const dateLabel = today.toLocaleString('default', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -50,6 +52,7 @@ export default function Dashboard({ currentPeriod, todayTasks, pastPeriods, toda
 
                     {/* ── Right column (1/3) ── */}
                     <div className="flex flex-col gap-6">
+                        <ProjectDistribution distribution={projectDistribution} fadeUp={fadeUp} />
                         <CompletionTrend pastPeriods={pastPeriods} fadeUp={fadeUp} />
                         <NotesReminder fadeUp={fadeUp} />
                         {/* <QuickLinks fadeUp={fadeUp} /> */}

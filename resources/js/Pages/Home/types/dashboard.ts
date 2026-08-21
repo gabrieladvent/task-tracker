@@ -45,3 +45,22 @@ export interface PastPeriod {
     total: number;
     done: number;
 }
+
+export interface ProjectDistributionRow {
+    id: string | null;
+    name: string;
+    color: string;
+    total: number;
+    done: number;
+    share_pct: number;
+}
+
+export interface ProjectDistributionScope {
+    total: number;
+    rows: ProjectDistributionRow[];
+}
+
+export interface ProjectDistribution {
+    period: ProjectDistributionScope;
+    all: ProjectDistributionScope;
+}
