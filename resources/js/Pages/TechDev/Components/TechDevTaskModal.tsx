@@ -1,10 +1,10 @@
-import { motion, AnimatePresence } from 'framer-motion';
 import { X, Folder, ArrowRight, Calendar } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useForm, router } from '@inertiajs/react';
 import toast from 'react-hot-toast';
 import { TechDevTask } from '../types/TechDevTask';
 import ConfirmDeleteModal from '@/Components/ConfirmDeleteModal';
+import BaseModal from '@/Components/BaseModal';
 
 interface Project {
     id: string;
@@ -103,28 +103,12 @@ export default function TechDevTaskModal({ isOpen, onClose, task, mode, projects
 
     return (
         <>
-            <AnimatePresence>
-                {isOpen && (
-                    <>
-                        {/* Backdrop */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={onClose}
-                            className="fixed inset-0 bg-black/50 z-40"
-                        />
-
-                        {/* Modal */}
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                {/* Header */}
+            <BaseModal
+                show={isOpen}
+                onClose={onClose}
+                panelClassName="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden"
+            >
+                {/* Header */}
                                 <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
                                     <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                                         {currentMode === 'create' && 'Create Tech Dev Task'}
@@ -393,11 +377,7 @@ export default function TechDevTaskModal({ isOpen, onClose, task, mode, projects
                                         </>
                                     )}
                                 </div>
-                            </motion.div>
-                        </div>
-                    </>
-                )}
-            </AnimatePresence>
+            </BaseModal>
 
             {/* Confirm Delete Modal */}
             <ConfirmDeleteModal
