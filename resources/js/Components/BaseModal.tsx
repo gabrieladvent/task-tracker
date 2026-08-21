@@ -44,23 +44,26 @@ export default function BaseModal({
                 onClose={close}
             >
                 <TransitionChild
-                    enter="ease-out duration-300"
+                    enter="ease-out duration-300 motion-reduce:transition-none"
                     enterFrom="opacity-0"
                     enterTo="opacity-100"
-                    leave="ease-in duration-200"
+                    leave="ease-in duration-200 motion-reduce:transition-none"
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 bg-black/50" aria-hidden="true" />
+                    <div
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+                        aria-hidden="true"
+                    />
                 </TransitionChild>
 
                 <TransitionChild
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0 scale-95"
-                    enterTo="opacity-100 scale-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100 scale-100"
-                    leaveTo="opacity-0 scale-95"
+                    enter="duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
+                    enterFrom="opacity-0 scale-95 translate-y-6"
+                    enterTo="opacity-100 scale-100 translate-y-0"
+                    leave="ease-in duration-200 motion-reduce:transition-none"
+                    leaveFrom="opacity-100 scale-100 translate-y-0"
+                    leaveTo="opacity-0 scale-95 translate-y-4"
                 >
                     <DialogPanel className={`relative ${panelClassName}`}>
                         {children}
