@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Period;
+use App\Models\Project;
 use App\Models\Task;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -16,7 +18,7 @@ class DashboardController extends Controller
         $todayStr = $today->format('Y-m-d');
 
         $currentPeriod = Period::with(['tasks' => function ($query) {
-            $query->select('id', 'period_id', 'parent_task_id', 'status', 'task_date', 'created_at');
+            $query->select('id', 'period_id', 'parent_task_id', 'project_id', 'status', 'task_date', 'created_at');
         }])
             ->where('start_date', '<=', $today)
             ->where('end_date', '>=', $today)
@@ -87,11 +89,75 @@ class DashboardController extends Controller
             ->reverse()
             ->values();
 
+        $projects = Project::select('id', 'name', 'color')->orderBy('name')->get();
+
+        $allTasks = Task::latestVersions(
+            Task::select('id', 'parent_task_id', 'project_id', 'status', 'task_date')->get()
+        );
+
+        $projectDistribution = [
+            'period' => $this->distributeByProject(
+                $currentPeriod ? Task::latestVersions($currentPeriod->tasks) : collect(),
+                $projects
+            ),
+            'all' => $this->distributeByProject($allTasks, $projects),
+        ];
+
         return Inertia::render('Home/Dashboard', [
             'currentPeriod' => $periodStats,
             'todayTasks' => $todayTasks,
             'pastPeriods' => $pastPeriods,
+            'projectDistribution' => $projectDistribution,
             'todayStr' => $todayStr,
         ]);
+    }
+
+    /**
+     * Count how the given tasks spread across projects. Every project is kept so
+     * an untouched project still shows up as a zero row, and tasks without a
+     * project only get their own bucket when there actually are some.
+     */
+    private function distributeByProject(Collection $tasks, Collection $projects): array
+    {
+        $total = $tasks->count();
+
+        $grouped = $tasks->groupBy(fn (Task $task) => $task->project_id ?? '');
+
+        $rows = $projects
+            ->map(fn ($project) => $this->distributionRow(
+                $project->id,
+                $project->name,
+                $project->color ?: '#94A3B8',
+                $grouped->get($project->id, collect()),
+                $total
+            ))
+            ->all();
+
+        $orphans = $grouped->get('', collect());
+
+        if ($orphans->isNotEmpty()) {
+            $rows[] = $this->distributionRow(null, 'No project', '#94A3B8', $orphans, $total);
+        }
+
+        usort($rows, fn ($a, $b) => $b['total'] <=> $a['total'] ?: strcmp($a['name'], $b['name']));
+
+        return [
+            'total' => $total,
+            'rows' => $rows,
+        ];
+    }
+
+    private function distributionRow(?string $id, string $name, string $color, Collection $tasks, int $total): array
+    {
+        $count = $tasks->count();
+
+        return [
+            'id' => $id,
+            'name' => $name,
+            'color' => $color,
+            'total' => $count,
+            'done' => $tasks->where('status.value', 'done')->count(),
+            'share_pct' => $total > 0 ? round(($count / $total) * 100, 1) : 0,
+        ];
     }
 }
