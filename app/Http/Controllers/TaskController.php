@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Period;
 use App\Models\Task;
+use App\Services\TaskActivityService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 
@@ -59,6 +61,11 @@ class TaskController extends Controller
         $task->update($validated);
 
         return back();
+    }
+
+    public function activities(Task $task, TaskActivityService $activities): JsonResponse
+    {
+        return response()->json($activities->timelineFor($task));
     }
 
     public function destroy(Task $task)

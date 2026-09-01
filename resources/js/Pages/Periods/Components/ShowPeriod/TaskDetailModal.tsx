@@ -9,6 +9,7 @@ import EditorJS from '@editorjs/editorjs';
 import { Trash, Save } from 'lucide-react';
 import { DEBOUNCE_DELAY, EDITOR_INIT_DELAY, EDITOR_TOOLS_CONFIG, PRIORITY_OPTIONS, STATUS_OPTIONS } from '../../Constants/StatusOption';
 import ConfirmDeleteModal from '@/Components/ConfirmDeleteModal';
+import TaskTimeline from './TaskTimeline';
 
 
 interface TaskDetailModalProps {
@@ -240,6 +241,7 @@ export default function TaskDetailModal({
     const [isSavingNotes, setIsSavingNotes] = useState(false);
     const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [historyToken, setHistoryToken] = useState(0);
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -351,9 +353,18 @@ export default function TaskDetailModal({
     const handleUpdateTask = useCallback(async (updates: Partial<any>) => {
         if (!task?.id || isNewTask) return;
 
+        // Notes auto-save on a debounce and are not logged, so they should not
+        // trigger a timeline refetch on every keystroke pause.
+        const affectsHistory = Object.keys(updates).some(field => field !== 'notes');
+
         try {
             await router.put(`/tasks/${task.id}`, updates, {
                 preserveScroll: true,
+                onSuccess: () => {
+                    if (affectsHistory) {
+                        setHistoryToken(token => token + 1);
+                    }
+                },
             });
 
             setFormData(prev => ({ ...prev, ...updates }));
@@ -660,6 +671,16 @@ export default function TaskDetailModal({
                                                 </a>
                                             )}
                                         </MotionSection>
+
+                                        {/* History */}
+                                        {!isNewTask && (
+                                            <MotionSection delay={0.38} className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-4">
+                                                    History
+                                                </label>
+                                                <TaskTimeline taskId={task.id} refreshToken={historyToken} />
+                                            </MotionSection>
+                                        )}
 
                                         {/* Action Buttons */}
                                         <MotionSection delay={0.4} className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
