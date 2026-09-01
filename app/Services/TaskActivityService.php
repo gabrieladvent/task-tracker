@@ -25,18 +25,7 @@ class TaskActivityService
 
         return [
             'summary' => $this->summarize($rootTaskId, $versions, $activities),
-            'activities' => $activities->map(fn (TaskActivity $activity) => [
-                'id' => (string) $activity->id,
-                'task_id' => $activity->task_id ? (string) $activity->task_id : null,
-                'type' => $activity->type->value,
-                'label' => $activity->type->label(),
-                'color' => $activity->type->color(),
-                'field' => $activity->field,
-                'from' => $activity->from_value,
-                'to' => $activity->to_value,
-                'task_date' => $activity->task_date?->format('Y-m-d'),
-                'occurred_at' => $activity->occurred_at->toIso8601String(),
-            ])->values(),
+            'activities' => $activities->map(fn (TaskActivity $activity) => $activity->toTimelineArray())->values(),
         ];
     }
 

@@ -5,6 +5,7 @@ import {
     GitPullRequest,
     Pencil,
     Plus,
+    RotateCcw,
     Trash2,
 } from 'lucide-react';
 import { TaskActivity, TaskActivityType } from '@/Pages/Periods/types/period';
@@ -17,15 +18,7 @@ export const ACTIVITY_ICONS: Record<TaskActivityType, typeof Plus> = {
     field_changed: Pencil,
     pr_linked: GitPullRequest,
     deleted: Trash2,
-};
-
-const FIELD_LABELS: Record<string, string> = {
-    title: 'Title',
-    description: 'Description',
-    priority: 'Priority',
-    story_points: 'Story points',
-    project_id: 'Project',
-    task_date: 'Date',
+    restored: RotateCcw,
 };
 
 export const formatActivityDay = (value: string | null): string =>
@@ -81,10 +74,15 @@ export const ActivityDescription = ({ activity }: { activity: TaskActivity }) =>
         case 'deleted':
             return <span>Task deleted</span>;
 
-        default: {
-            const field = FIELD_LABELS[activity.field ?? ''] ?? activity.field ?? 'Field';
+        case 'restored':
+            return <span>Task restored</span>;
 
-            if (activity.field === 'description' || activity.field === 'title') {
+        default: {
+            // Label and opacity come from the server so the timeline and the
+            // spreadsheet export never disagree about what a field is called.
+            const field = activity.field_label ?? 'Field';
+
+            if (activity.field_is_opaque) {
                 return <span>{field} updated</span>;
             }
 

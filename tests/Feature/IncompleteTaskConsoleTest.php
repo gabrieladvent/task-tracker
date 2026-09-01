@@ -171,21 +171,51 @@ test('command copies tasks across different periods', function () {
     expect($copiedTask->period_id)->toBe($this->period2->id);
 });
 
-test('command skips duplicate tasks', function () {
+test('command skips a chain already copied to the target date', function () {
+    $yesterday = Carbon::yesterday()->startOfDay();
+    $today = Carbon::today()->startOfDay();
+
+    $original = Task::factory()->create([
+        'period_id' => $this->currentPeriod->id,
+        'task_date' => $yesterday,
+        'title' => 'Carried Task',
+        'status' => 'in_progress',
+    ]);
+
+    Task::factory()->create([
+        'period_id' => $this->currentPeriod->id,
+        'parent_task_id' => $original->id,
+        'task_date' => $today,
+        'title' => 'Carried Task',
+        'status' => 'in_progress',
+    ]);
+
+    Artisan::call('tasks:copy-incomplete');
+
+    expect(
+        Task::inChain($original->id)
+            ->whereDate('task_date', $today->format('Y-m-d'))
+            ->count()
+    )->toBe(1);
+});
+
+test('command copies unrelated tasks that happen to share a title', function () {
     $yesterday = Carbon::yesterday()->startOfDay();
     $today = Carbon::today()->startOfDay();
 
     Task::factory()->create([
         'period_id' => $this->currentPeriod->id,
         'task_date' => $yesterday,
-        'title' => 'Duplicate Task',
+        'title' => 'Same Name',
         'status' => 'in_progress',
     ]);
 
+    // A different chain that merely shares the title. Matching on the title
+    // used to make this one swallow the copy above.
     Task::factory()->create([
         'period_id' => $this->currentPeriod->id,
         'task_date' => $today,
-        'title' => 'Duplicate Task',
+        'title' => 'Same Name',
         'status' => 'in_progress',
     ]);
 
@@ -193,9 +223,9 @@ test('command skips duplicate tasks', function () {
 
     expect(
         Task::whereDate('task_date', $today->format('Y-m-d'))
-            ->where('title', 'Duplicate Task')
+            ->where('title', 'Same Name')
             ->count()
-    )->toBe(1);
+    )->toBe(2);
 });
 
 test('command returns success when no incomplete tasks found', function () {
@@ -286,7 +316,7 @@ test('command shows warning for skipped duplicates', function () {
     $yesterday = Carbon::yesterday()->startOfDay();
     $today = Carbon::today()->startOfDay();
 
-    Task::factory()->create([
+    $original = Task::factory()->create([
         'period_id' => $this->currentPeriod->id,
         'task_date' => $yesterday,
         'title' => 'Duplicate Task',
@@ -295,6 +325,7 @@ test('command shows warning for skipped duplicates', function () {
 
     Task::factory()->create([
         'period_id' => $this->currentPeriod->id,
+        'parent_task_id' => $original->id,
         'task_date' => $today,
         'title' => 'Duplicate Task',
         'status' => 'in_progress',

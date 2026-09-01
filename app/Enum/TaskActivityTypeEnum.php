@@ -10,6 +10,7 @@ enum TaskActivityTypeEnum: string
     case FIELD_CHANGED = 'field_changed';
     case PR_LINKED = 'pr_linked';
     case DELETED = 'deleted';
+    case RESTORED = 'restored';
 
     public function color(): string
     {
@@ -20,6 +21,7 @@ enum TaskActivityTypeEnum: string
             self::FIELD_CHANGED => '#A0AEC0', // gray-blue
             self::PR_LINKED => '#9F7AEA', // purple
             self::DELETED => '#F56565', // red
+            self::RESTORED => '#38B2AC', // teal
         };
     }
 
@@ -32,6 +34,7 @@ enum TaskActivityTypeEnum: string
             self::FIELD_CHANGED => 'Updated',
             self::PR_LINKED => 'Pull request linked',
             self::DELETED => 'Deleted',
+            self::RESTORED => 'Restored',
         };
     }
 }

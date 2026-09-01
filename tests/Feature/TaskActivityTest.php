@@ -41,14 +41,16 @@ test('changing status logs the transition with both ends', function () {
         ->and($activity->to_value)->toBe('in_progress');
 });
 
-test('editing notes does not pollute the timeline', function () {
+test('a day of notes auto-saves collapses into one entry', function () {
     $task = Task::factory()->forPeriod($this->period)->create();
 
-    $this->actingAs($this->user)
-        ->put(route('tasks.update', $task), ['notes' => '{"blocks":[]}'])
-        ->assertRedirect();
+    foreach (['one', 'two', 'three'] as $draft) {
+        $this->actingAs($this->user)
+            ->put(route('tasks.update', $task), ['notes' => '{"blocks":["'.$draft.'"]}'])
+            ->assertRedirect();
+    }
 
-    expect(TaskActivity::forChain($task->id)->where('type', '!=', 'created')->count())->toBe(0);
+    expect(TaskActivity::forChain($task->id)->where('field', 'notes')->count())->toBe(1);
 });
 
 test('a carry-over appends to the original chain instead of starting a new one', function () {
@@ -113,6 +115,16 @@ test('the log outlives the tasks it describes', function () {
         ->and(TaskActivity::forChain($original->id)->count())->toBeGreaterThan(0);
 });
 
+test('restoring a task is recorded', function () {
+    $task = Task::factory()->forPeriod($this->period)->create();
+
+    $task->delete();
+    $task->restore();
+
+    expect(TaskActivity::forChain($task->id)->pluck('type')->map->value->all())
+        ->toBe(['created', 'deleted', 'restored']);
+});
+
 test('backfill reconstructs history for tasks created before logging existed', function () {
     $task = Task::factory()->forPeriod($this->period)->create([
         'status_changed_at' => Carbon::now(),
@@ -129,4 +141,57 @@ test('backfill reconstructs history for tasks created before logging existed', f
     Artisan::call('tasks:backfill-activities');
 
     expect(TaskActivity::forChain($task->id)->count())->toBe(2);
+});
+
+test('a project change is logged by name, not by id', function () {
+    $from = App\Models\Project::factory()->create(['name' => 'Kraken']);
+    $to = App\Models\Project::factory()->create(['name' => 'Hermes']);
+
+    $task = Task::factory()->forPeriod($this->period)->create(['project_id' => $from->id]);
+
+    $this->actingAs($this->user)
+        ->put(route('tasks.update', $task), ['project_id' => $to->id])
+        ->assertRedirect();
+
+    $activity = TaskActivity::forChain($task->id)->where('field', 'project_id')->sole();
+
+    expect($activity->from_value)->toBe('Kraken')
+        ->and($activity->to_value)->toBe('Hermes');
+});
+
+test('the name survives the project being renamed or trashed later', function () {
+    $project = App\Models\Project::factory()->create(['name' => 'Kraken']);
+    $task = Task::factory()->forPeriod($this->period)->create(['project_id' => null]);
+
+    $this->actingAs($this->user)->put(route('tasks.update', $task), ['project_id' => $project->id]);
+
+    $project->update(['name' => 'Kraken v2']);
+    $project->delete();
+
+    expect(TaskActivity::forChain($task->id)->where('field', 'project_id')->sole()->to_value)
+        ->toBe('Kraken');
+});
+
+test('field labels reach both renderers from one place', function () {
+    $task = Task::factory()->forPeriod($this->period)->create(['story_points' => 3]);
+
+    $this->actingAs($this->user)->put(route('tasks.update', $task), ['story_points' => 8]);
+
+    $activity = TaskActivity::forChain($task->id)->where('field', 'story_points')->sole();
+
+    expect($activity->toTimelineArray())
+        ->toMatchArray([
+            'field' => 'story_points',
+            'field_label' => 'Story points',
+            'field_is_opaque' => false,
+        ]);
+});
+
+test('notes are marked opaque so neither renderer prints the blob', function () {
+    $task = Task::factory()->forPeriod($this->period)->create();
+
+    $this->actingAs($this->user)->put(route('tasks.update', $task), ['notes' => '{"blocks":[]}']);
+
+    expect(TaskActivity::forChain($task->id)->where('field', 'notes')->sole()->toTimelineArray())
+        ->toMatchArray(['field_label' => 'Notes', 'field_is_opaque' => true]);
 });

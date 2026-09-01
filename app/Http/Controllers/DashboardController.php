@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Period;
 use App\Models\Project;
 use App\Models\Task;
+use App\Services\StuckTaskService;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    public function index(): \Inertia\Response
+    public function index(StuckTaskService $stuckTasks): \Inertia\Response
     {
         $today = Carbon::today();
 
@@ -108,6 +109,7 @@ class DashboardController extends Controller
             'todayTasks' => $todayTasks,
             'pastPeriods' => $pastPeriods,
             'projectDistribution' => $projectDistribution,
+            'stuckTasks' => $stuckTasks->stuckTasks(),
             'todayStr' => $todayStr,
         ]);
     }

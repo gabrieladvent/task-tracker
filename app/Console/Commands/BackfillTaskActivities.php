@@ -26,7 +26,7 @@ class BackfillTaskActivities extends Command
 
         $tasks = Task::query()
             ->orderBy('created_at')
-            ->get(['id', 'parent_task_id', 'title', 'status', 'priority', 'task_date', 'created_at', 'status_changed_at', 'link_pull_request']);
+            ->get(['id', 'parent_task_id', 'status', 'priority', 'task_date', 'created_at', 'status_changed_at']);
 
         $rows = [];
 

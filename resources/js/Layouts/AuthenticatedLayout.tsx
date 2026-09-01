@@ -33,6 +33,7 @@ const navItems = (badges?: NavBadges) => [
     { label: 'Reports', route: 'reports.index', match: 'reports.*', badge: badges?.reports },
     { label: 'Tech Dev', route: 'tech-dev.index', match: 'tech-dev.*', badge: badges?.techDev },
     { label: 'Notes', route: 'notes.index', match: 'notes.*', badge: badges?.notes },
+    { label: 'Trash', route: 'trash.index', match: 'trash.*', badge: null },
 ];
 
 export default function Authenticated({
