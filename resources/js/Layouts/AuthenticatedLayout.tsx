@@ -29,6 +29,7 @@ const navItems = (badges?: NavBadges) => [
     { label: 'Dashboard', route: 'dashboard', match: 'dashboard', badge: null },
     { label: 'Periods', route: 'periods.index', match: 'periods.*', badge: badges?.periods, excludeMatch: 'periods.reports.*' },
     { label: 'Projects', route: 'projects.index', match: 'projects.*', badge: badges?.projects },
+    { label: 'Activity', route: 'activity.index', match: 'activity.*', badge: null },
     { label: 'Reports', route: 'reports.index', match: 'reports.*', badge: badges?.reports },
     { label: 'Tech Dev', route: 'tech-dev.index', match: 'tech-dev.*', badge: badges?.techDev },
     { label: 'Notes', route: 'notes.index', match: 'notes.*', badge: badges?.notes },
