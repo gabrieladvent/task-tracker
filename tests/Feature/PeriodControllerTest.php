@@ -69,7 +69,7 @@ test('destroy removes a period', function () {
         ->delete(route('periods.destroy', $period))
         ->assertRedirect(route('periods.index'));
 
-    $this->assertModelMissing($period);
+    $this->assertSoftDeleted($period);
 });
 
 test('last period redirects to the current period', function () {

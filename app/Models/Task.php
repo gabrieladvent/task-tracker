@@ -9,12 +9,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 
 class Task extends Model
 {
     use HasFactory;
     use HasUuids;
+    use SoftDeletes;
 
     protected $fillable = [
         'period_id',
@@ -52,9 +54,13 @@ class Task extends Model
         return $this->belongsTo(Period::class);
     }
 
+    /**
+     * Kept withTrashed so a task deleted alongside its project still reads as
+     * "Kraken" in history rather than losing the label it was filed under.
+     */
     public function project(): BelongsTo
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(Project::class)->withTrashed();
     }
 
     public function parentTask(): BelongsTo
