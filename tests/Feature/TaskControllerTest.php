@@ -68,7 +68,7 @@ test('destroy removes the task', function () {
         ->delete(route('tasks.destroy', $task))
         ->assertRedirect();
 
-    $this->assertModelMissing($task);
+    $this->assertSoftDeleted($task);
 });
 
 test('generate tasks is blocked outside the local environment', function () {

@@ -104,8 +104,10 @@ test('the log outlives the tasks it describes', function () {
 
     Artisan::call('tasks:copy-incomplete');
 
-    // Deleting the root cascades the whole chain away at the database level.
-    $original->delete();
+    // A normal delete is soft now, so force one: this is the only remaining
+    // path where the chain really leaves the database and takes its rows with
+    // it through the parent_task_id cascade.
+    $original->forceDelete();
 
     expect(Task::inChain($original->id)->count())->toBe(0)
         ->and(TaskActivity::forChain($original->id)->count())->toBeGreaterThan(0);

@@ -55,7 +55,7 @@ test('destroy removes a project', function () {
         ->delete(route('projects.destroy', $project))
         ->assertRedirect(route('projects.index'));
 
-    $this->assertModelMissing($project);
+    $this->assertSoftDeleted($project);
 });
 
 test('per page is clamped to a sane maximum', function () {

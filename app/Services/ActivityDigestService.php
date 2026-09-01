@@ -62,14 +62,16 @@ class ActivityDigestService
         $tasks = Task::query()
             ->whereIn('id', $rootIds)
             ->orWhereIn('parent_task_id', $rootIds)
-            ->with('project:id,name,color')
+            ->with(['project:id,name,color', 'period:id'])
             ->get(['id', 'parent_task_id', 'period_id', 'project_id', 'title', 'status', 'task_date']);
 
         return Task::latestVersions($tasks)
             ->mapWithKeys(fn (Task $task) => [
                 $task->getOriginalTaskId() => [
                     'task_id' => (string) $task->id,
-                    'period_id' => (string) $task->period_id,
+                    // Null once the period is gone: the digest links to it, and
+                    // route binding would 404 on a trashed one.
+                    'period_id' => $task->period ? (string) $task->period_id : null,
                     'title' => $task->title,
                     'status' => $task->status->value,
                     'project_id' => $task->project_id,
