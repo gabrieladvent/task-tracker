@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('projects', ProjectController::class);
 
     Route::prefix('tasks')->group(function () {
+        Route::get('/{task}/activities', [TaskController::class, 'activities'])->name('tasks.activities');
         Route::put('/{task}', [TaskController::class, 'update'])->name('tasks.update');
         Route::delete('/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
     });

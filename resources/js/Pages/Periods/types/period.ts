@@ -117,3 +117,43 @@ export interface BoardColumn {
 export interface BoardData {
     columns: BoardColumn[];
 }
+
+export type TaskActivityType =
+    | "created"
+    | "carried_over"
+    | "status_changed"
+    | "field_changed"
+    | "pr_linked"
+    | "deleted";
+
+export interface TaskActivity {
+    id: string;
+    task_id: string | null;
+    type: TaskActivityType;
+    label: string;
+    color: string;
+    field: string | null;
+    from: unknown;
+    to: unknown;
+    task_date: string | null;
+    occurred_at: string;
+}
+
+export interface TaskTimelineSummary {
+    root_task_id: string;
+    version_count: number;
+    carry_over_count: number;
+    activity_count: number;
+    first_seen_at: string | null;
+    first_task_date: string | null;
+    last_task_date: string | null;
+    last_activity_at: string | null;
+    age_days: number;
+    current_status: string | null;
+    is_open: boolean;
+}
+
+export interface TaskTimeline {
+    summary: TaskTimelineSummary;
+    activities: TaskActivity[];
+}

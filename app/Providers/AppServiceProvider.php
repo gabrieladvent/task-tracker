@@ -5,10 +5,12 @@ namespace App\Providers;
 use App\Models\Period;
 use App\Models\PeriodReport;
 use App\Models\Project;
+use App\Models\Task;
 use App\Models\TechDevTask;
 use App\Observers\PeriodObserver;
 use App\Observers\ProjectObserver;
 use App\Observers\ReportObserver;
+use App\Observers\TaskObserver;
 use App\Observers\TechDevObserver;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -32,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
         Period::observe(PeriodObserver::class);
         Project::observe(ProjectObserver::class);
         PeriodReport::observe(ReportObserver::class);
+        Task::observe(TaskObserver::class);
         TechDevTask::observe(TechDevObserver::class);
     }
 }
