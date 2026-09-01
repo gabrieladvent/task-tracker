@@ -2,10 +2,11 @@ import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { PastPeriod, PeriodStats, ProjectDistribution as Distribution, TodayTask } from './types/dashboard';
+import { PastPeriod, PeriodStats, ProjectDistribution as Distribution, StuckTasks as StuckTasksData, TodayTask } from './types/dashboard';
 import { DashboardHeader } from './Components/DashboardHeader';
 import { CurrentPeriodCard } from './Components/CurrentPeriodCard';
 import { TodayTaskList } from './Components/TodayTaskList';
+import { StuckTasks } from './Components/StuckTasks';
 import { CompletionTrend } from './Components/CompletionTrend';
 import { ProjectDistribution } from './Components/Distribution';
 import { QuickLinks } from './Components/QuickLinks';
@@ -17,6 +18,7 @@ interface Props {
     todayTasks: TodayTask[];
     pastPeriods: PastPeriod[];
     projectDistribution: Distribution;
+    stuckTasks: StuckTasksData;
     todayStr: string;
 }
 
@@ -28,7 +30,7 @@ function fadeUp(delay = 0) {
     };
 }
 
-export default function Dashboard({ currentPeriod, todayTasks, pastPeriods, projectDistribution, todayStr }: Props) {
+export default function Dashboard({ currentPeriod, todayTasks, pastPeriods, projectDistribution, stuckTasks, todayStr }: Props) {
     const today = new Date(todayStr);
     const dayName = today.toLocaleString('default', { weekday: 'long' });
     const dateLabel = today.toLocaleString('default', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -48,6 +50,7 @@ export default function Dashboard({ currentPeriod, todayTasks, pastPeriods, proj
                     <div className="lg:col-span-2 flex flex-col gap-6">
                         <CurrentPeriodCard currentPeriod={currentPeriod} fadeUp={fadeUp} />
                         <TodayTaskList currentPeriod={currentPeriod} todayTasks={todayTasks} fadeUp={fadeUp} />
+                        <StuckTasks stuckTasks={stuckTasks} fadeUp={fadeUp} />
                     </div>
 
                     {/* ── Right column (1/3) ── */}

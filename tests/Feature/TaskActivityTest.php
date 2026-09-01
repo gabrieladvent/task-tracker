@@ -41,14 +41,16 @@ test('changing status logs the transition with both ends', function () {
         ->and($activity->to_value)->toBe('in_progress');
 });
 
-test('editing notes does not pollute the timeline', function () {
+test('a day of notes auto-saves collapses into one entry', function () {
     $task = Task::factory()->forPeriod($this->period)->create();
 
-    $this->actingAs($this->user)
-        ->put(route('tasks.update', $task), ['notes' => '{"blocks":[]}'])
-        ->assertRedirect();
+    foreach (['one', 'two', 'three'] as $draft) {
+        $this->actingAs($this->user)
+            ->put(route('tasks.update', $task), ['notes' => '{"blocks":["'.$draft.'"]}'])
+            ->assertRedirect();
+    }
 
-    expect(TaskActivity::forChain($task->id)->where('type', '!=', 'created')->count())->toBe(0);
+    expect(TaskActivity::forChain($task->id)->where('field', 'notes')->count())->toBe(1);
 });
 
 test('a carry-over appends to the original chain instead of starting a new one', function () {
@@ -111,6 +113,16 @@ test('the log outlives the tasks it describes', function () {
 
     expect(Task::inChain($original->id)->count())->toBe(0)
         ->and(TaskActivity::forChain($original->id)->count())->toBeGreaterThan(0);
+});
+
+test('restoring a task is recorded', function () {
+    $task = Task::factory()->forPeriod($this->period)->create();
+
+    $task->delete();
+    $task->restore();
+
+    expect(TaskActivity::forChain($task->id)->pluck('type')->map->value->all())
+        ->toBe(['created', 'deleted', 'restored']);
 });
 
 test('backfill reconstructs history for tasks created before logging existed', function () {

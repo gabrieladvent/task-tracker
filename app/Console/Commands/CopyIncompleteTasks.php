@@ -52,12 +52,13 @@ class CopyIncompleteTasks extends Command
         $copiedCount = 0;
 
         foreach ($incompleteTasks as $task) {
-            $existingTask = Task::whereDate('task_date', $targetDate->format('Y-m-d'))
-                ->where('title', $task->title)
-                ->where('period_id', $targetPeriod->id)
-                ->first();
+            // Matched on the chain, not the title: two unrelated tasks can share
+            // a title, and renaming one used to make it duplicate itself.
+            $alreadyCopied = Task::inChain($task->getOriginalTaskId())
+                ->whereDate('task_date', $targetDate->format('Y-m-d'))
+                ->exists();
 
-            if ($existingTask) {
+            if ($alreadyCopied) {
                 $this->warn("Task '{$task->title}' already exists for {$targetDate->format('Y-m-d')}. Skipping.");
 
                 continue;

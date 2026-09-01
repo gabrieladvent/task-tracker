@@ -43,6 +43,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::get('/activity', [ActivityController::class, 'index'])->name('activity.index');
+    Route::get('/activity/export', [ActivityController::class, 'export'])->name('activity.export');
 
     Route::get('/project', [ProjectController::class, 'getAllProject'])->name('projects.api.index');
 

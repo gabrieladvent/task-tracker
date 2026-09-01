@@ -5,6 +5,7 @@ import {
     GitPullRequest,
     Pencil,
     Plus,
+    RotateCcw,
     Trash2,
 } from 'lucide-react';
 import { TaskActivity, TaskActivityType } from '@/Pages/Periods/types/period';
@@ -17,6 +18,7 @@ export const ACTIVITY_ICONS: Record<TaskActivityType, typeof Plus> = {
     field_changed: Pencil,
     pr_linked: GitPullRequest,
     deleted: Trash2,
+    restored: RotateCcw,
 };
 
 const FIELD_LABELS: Record<string, string> = {
@@ -26,7 +28,11 @@ const FIELD_LABELS: Record<string, string> = {
     story_points: 'Story points',
     project_id: 'Project',
     task_date: 'Date',
+    notes: 'Notes',
 };
+
+/** Fields whose values are too large or too noisy to show inline. */
+const OPAQUE_FIELDS = ['title', 'description', 'notes'];
 
 export const formatActivityDay = (value: string | null): string =>
     value ? format(parseISO(value), 'd MMM yyyy') : '—';
@@ -81,10 +87,13 @@ export const ActivityDescription = ({ activity }: { activity: TaskActivity }) =>
         case 'deleted':
             return <span>Task deleted</span>;
 
+        case 'restored':
+            return <span>Task restored</span>;
+
         default: {
             const field = FIELD_LABELS[activity.field ?? ''] ?? activity.field ?? 'Field';
 
-            if (activity.field === 'description' || activity.field === 'title') {
+            if (OPAQUE_FIELDS.includes(activity.field ?? '')) {
                 return <span>{field} updated</span>;
             }
 

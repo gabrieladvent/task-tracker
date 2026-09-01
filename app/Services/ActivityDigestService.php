@@ -6,6 +6,7 @@ use App\Enum\StatusEnum;
 use App\Enum\TaskActivityTypeEnum;
 use App\Models\Task;
 use App\Models\TaskActivity;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
@@ -19,7 +20,7 @@ use Illuminate\Support\Collection;
  */
 class ActivityDigestService
 {
-    public function digest(Carbon $from, Carbon $to, ?string $projectId = null): array
+    public function digest(CarbonInterface $from, CarbonInterface $to, ?string $projectId = null): array
     {
         $activities = TaskActivity::query()
             ->whereBetween('occurred_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()])

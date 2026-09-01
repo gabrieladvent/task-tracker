@@ -124,7 +124,8 @@ export type TaskActivityType =
     | "status_changed"
     | "field_changed"
     | "pr_linked"
-    | "deleted";
+    | "deleted"
+    | "restored";
 
 export interface TaskActivity {
     id: string;

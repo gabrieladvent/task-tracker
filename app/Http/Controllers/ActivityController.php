@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ActivityDigestExport;
 use App\Models\Project;
 use App\Services\ActivityDigestService;
 use Illuminate\Http\Request;
@@ -9,6 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ActivityController extends Controller
 {
@@ -20,12 +22,7 @@ class ActivityController extends Controller
 
     public function index(Request $request): Response
     {
-        $validated = $request->validate([
-            'preset' => ['nullable', Rule::in(self::PRESETS)],
-            'from' => ['nullable', 'date'],
-            'to' => ['nullable', 'date', 'after_or_equal:from'],
-            'project_id' => ['nullable', 'exists:projects,id'],
-        ]);
+        $validated = $this->validateFilters($request);
 
         [$preset, $from, $to] = $this->resolveRange($validated);
 
@@ -40,6 +37,30 @@ class ActivityController extends Controller
                 'to' => $to->format('Y-m-d'),
                 'project_id' => $projectId,
             ],
+        ]);
+    }
+
+    public function export(Request $request)
+    {
+        $validated = $this->validateFilters($request);
+
+        [, $from, $to] = $this->resolveRange($validated);
+
+        $digest = $this->digest->digest($from, $to, $validated['project_id'] ?? null);
+
+        return Excel::download(
+            new ActivityDigestExport($digest, $from->format('Y-m-d'), $to->format('Y-m-d')),
+            sprintf('activity_%s_to_%s.xlsx', $from->format('Ymd'), $to->format('Ymd'))
+        );
+    }
+
+    private function validateFilters(Request $request): array
+    {
+        return $request->validate([
+            'preset' => ['nullable', Rule::in(self::PRESETS)],
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date', 'after_or_equal:from'],
+            'project_id' => ['nullable', 'exists:projects,id'],
         ]);
     }
 

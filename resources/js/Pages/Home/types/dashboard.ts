@@ -64,3 +64,27 @@ export interface ProjectDistribution {
     period: ProjectDistributionScope;
     all: ProjectDistributionScope;
 }
+
+export interface StuckTask {
+    root_task_id: string;
+    task_id: string;
+    period_id: string;
+    title: string;
+    status: string;
+    priority: string;
+    project: {
+        id: string;
+        name: string;
+        color: string | null;
+    } | null;
+    carry_over_count: number;
+    age_days: number;
+    first_task_date: string;
+    last_task_date: string;
+    days_since_status_change: number | null;
+}
+
+export interface StuckTasks {
+    threshold: number;
+    tasks: StuckTask[];
+}
