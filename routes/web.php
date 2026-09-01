@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\PeriodController;
@@ -40,6 +41,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/generate-tasks', [TaskController::class, 'generateTasks'])
             ->name('periods.generate-tasks');
     });
+
+    Route::get('/activity', [ActivityController::class, 'index'])->name('activity.index');
 
     Route::get('/project', [ProjectController::class, 'getAllProject'])->name('projects.api.index');
 
