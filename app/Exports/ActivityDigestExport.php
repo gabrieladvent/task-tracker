@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Enum\TaskActivityTypeEnum;
+use App\Enum\TaskFieldEnum;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -89,17 +90,16 @@ class ActivityDigestExport implements FromCollection, WithHeadings, WithStyles, 
                 : "{$from} → {$to}",
             TaskActivityTypeEnum::FIELD_CHANGED->value => $this->describeFieldChange($activity, $from, $to),
             TaskActivityTypeEnum::PR_LINKED->value => $to === '' ? 'removed' : $to,
+            TaskActivityTypeEnum::CREATED->value => $this->humanize($this->flatten($activity['to']['status'] ?? null)),
             default => '',
         };
     }
 
     private function describeFieldChange(array $activity, string $from, string $to): string
     {
-        $field = $this->humanize((string) ($activity['field'] ?? ''));
+        $field = $activity['field_label'] ?? TaskFieldEnum::labelFor($activity['field']) ?? '';
 
-        // Titles, descriptions and notes are long free text; naming the field
-        // is more useful in a cell than dumping both versions of it.
-        if (in_array($activity['field'], ['title', 'description', 'notes'], true)) {
+        if ($activity['field_is_opaque'] ?? TaskFieldEnum::isOpaqueField($activity['field'])) {
             return $field;
         }
 

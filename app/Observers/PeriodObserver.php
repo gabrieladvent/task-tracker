@@ -16,4 +16,9 @@ class PeriodObserver
     {
         Cache::forget('badge_count_periods');
     }
+
+    public function restored(Period $period): void
+    {
+        Cache::forget('badge_count_periods');
+    }
 }

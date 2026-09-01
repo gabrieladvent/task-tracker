@@ -134,6 +134,8 @@ export interface TaskActivity {
     label: string;
     color: string;
     field: string | null;
+    field_label: string | null;
+    field_is_opaque: boolean;
     from: unknown;
     to: unknown;
     task_date: string | null;

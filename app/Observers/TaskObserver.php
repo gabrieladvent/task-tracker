@@ -3,6 +3,8 @@
 namespace App\Observers;
 
 use App\Enum\TaskActivityTypeEnum;
+use App\Enum\TaskFieldEnum;
+use App\Models\Project;
 use App\Models\Task;
 use App\Models\TaskActivity;
 use BackedEnum;
@@ -54,9 +56,9 @@ class TaskObserver
         foreach ($task->getChanges() as $field => $newValue) {
             $from = $task->getRawOriginal($field);
 
-            if ($field === 'status') {
+            if ($field === TaskFieldEnum::STATUS->value) {
                 $this->record($task, TaskActivityTypeEnum::STATUS_CHANGED,
-                    field: 'status',
+                    field: TaskFieldEnum::STATUS->value,
                     from: $this->scalar($from),
                     to: $this->scalar($newValue),
                 );
@@ -64,9 +66,9 @@ class TaskObserver
                 continue;
             }
 
-            if ($field === 'link_pull_request') {
+            if ($field === TaskFieldEnum::LINK_PULL_REQUEST->value) {
                 $this->record($task, TaskActivityTypeEnum::PR_LINKED,
-                    field: 'link_pull_request',
+                    field: TaskFieldEnum::LINK_PULL_REQUEST->value,
                     from: $this->scalar($from),
                     to: $this->scalar($newValue),
                 );
@@ -74,7 +76,7 @@ class TaskObserver
                 continue;
             }
 
-            if ($field === 'notes') {
+            if ($field === TaskFieldEnum::NOTES->value) {
                 $this->recordNotesEdit($task);
 
                 continue;
@@ -117,7 +119,7 @@ class TaskObserver
     {
         $alreadyLoggedToday = TaskActivity::query()
             ->where('task_id', $task->getKey())
-            ->where('field', 'notes')
+            ->where('field', TaskFieldEnum::NOTES->value)
             ->whereDate('occurred_at', Carbon::today())
             ->exists();
 
@@ -126,7 +128,7 @@ class TaskObserver
         }
 
         // No values: notes are a large Editor.js blob, useless in a timeline.
-        $this->record($task, TaskActivityTypeEnum::FIELD_CHANGED, field: 'notes');
+        $this->record($task, TaskActivityTypeEnum::FIELD_CHANGED, field: TaskFieldEnum::NOTES->value);
     }
 
     private function record(
@@ -150,8 +152,16 @@ class TaskObserver
 
     private function normalizeField(string $field, mixed $value): mixed
     {
-        if ($field === 'task_date' && $value !== null) {
+        if ($field === TaskFieldEnum::TASK_DATE->value && $value !== null) {
             return Carbon::parse($value)->format('Y-m-d');
+        }
+
+        // A project id in a timeline row is unreadable, and the project may be
+        // renamed or trashed later, so the name is captured as it was.
+        if ($field === TaskFieldEnum::PROJECT->value) {
+            return $value === null
+                ? null
+                : Project::withTrashed()->whereKey($value)->value('name');
         }
 
         return $this->scalar($value);

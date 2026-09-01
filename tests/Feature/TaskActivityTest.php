@@ -142,3 +142,56 @@ test('backfill reconstructs history for tasks created before logging existed', f
 
     expect(TaskActivity::forChain($task->id)->count())->toBe(2);
 });
+
+test('a project change is logged by name, not by id', function () {
+    $from = App\Models\Project::factory()->create(['name' => 'Kraken']);
+    $to = App\Models\Project::factory()->create(['name' => 'Hermes']);
+
+    $task = Task::factory()->forPeriod($this->period)->create(['project_id' => $from->id]);
+
+    $this->actingAs($this->user)
+        ->put(route('tasks.update', $task), ['project_id' => $to->id])
+        ->assertRedirect();
+
+    $activity = TaskActivity::forChain($task->id)->where('field', 'project_id')->sole();
+
+    expect($activity->from_value)->toBe('Kraken')
+        ->and($activity->to_value)->toBe('Hermes');
+});
+
+test('the name survives the project being renamed or trashed later', function () {
+    $project = App\Models\Project::factory()->create(['name' => 'Kraken']);
+    $task = Task::factory()->forPeriod($this->period)->create(['project_id' => null]);
+
+    $this->actingAs($this->user)->put(route('tasks.update', $task), ['project_id' => $project->id]);
+
+    $project->update(['name' => 'Kraken v2']);
+    $project->delete();
+
+    expect(TaskActivity::forChain($task->id)->where('field', 'project_id')->sole()->to_value)
+        ->toBe('Kraken');
+});
+
+test('field labels reach both renderers from one place', function () {
+    $task = Task::factory()->forPeriod($this->period)->create(['story_points' => 3]);
+
+    $this->actingAs($this->user)->put(route('tasks.update', $task), ['story_points' => 8]);
+
+    $activity = TaskActivity::forChain($task->id)->where('field', 'story_points')->sole();
+
+    expect($activity->toTimelineArray())
+        ->toMatchArray([
+            'field' => 'story_points',
+            'field_label' => 'Story points',
+            'field_is_opaque' => false,
+        ]);
+});
+
+test('notes are marked opaque so neither renderer prints the blob', function () {
+    $task = Task::factory()->forPeriod($this->period)->create();
+
+    $this->actingAs($this->user)->put(route('tasks.update', $task), ['notes' => '{"blocks":[]}']);
+
+    expect(TaskActivity::forChain($task->id)->where('field', 'notes')->sole()->toTimelineArray())
+        ->toMatchArray(['field_label' => 'Notes', 'field_is_opaque' => true]);
+});

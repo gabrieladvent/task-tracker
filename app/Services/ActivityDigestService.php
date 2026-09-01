@@ -104,7 +104,7 @@ class ActivityDigestService
                     'project' => $chain['project'],
                     'is_deleted' => $chain['task_id'] === null,
                     'activities' => $taskActivities
-                        ->map(fn (TaskActivity $activity) => $this->presentActivity($activity))
+                        ->map(fn (TaskActivity $activity) => $activity->toTimelineArray())
                         ->values()
                         ->all(),
                 ];
@@ -137,22 +137,6 @@ class ActivityDigestService
             'status' => data_get($deletion?->from_value, 'status'),
             'project_id' => null,
             'project' => null,
-        ];
-    }
-
-    private function presentActivity(TaskActivity $activity): array
-    {
-        return [
-            'id' => (string) $activity->id,
-            'task_id' => $activity->task_id ? (string) $activity->task_id : null,
-            'type' => $activity->type->value,
-            'label' => $activity->type->label(),
-            'color' => $activity->type->color(),
-            'field' => $activity->field,
-            'from' => $activity->from_value,
-            'to' => $activity->to_value,
-            'task_date' => $activity->task_date?->format('Y-m-d'),
-            'occurred_at' => $activity->occurred_at->toIso8601String(),
         ];
     }
 

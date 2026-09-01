@@ -21,19 +21,6 @@ export const ACTIVITY_ICONS: Record<TaskActivityType, typeof Plus> = {
     restored: RotateCcw,
 };
 
-const FIELD_LABELS: Record<string, string> = {
-    title: 'Title',
-    description: 'Description',
-    priority: 'Priority',
-    story_points: 'Story points',
-    project_id: 'Project',
-    task_date: 'Date',
-    notes: 'Notes',
-};
-
-/** Fields whose values are too large or too noisy to show inline. */
-const OPAQUE_FIELDS = ['title', 'description', 'notes'];
-
 export const formatActivityDay = (value: string | null): string =>
     value ? format(parseISO(value), 'd MMM yyyy') : '—';
 
@@ -91,9 +78,11 @@ export const ActivityDescription = ({ activity }: { activity: TaskActivity }) =>
             return <span>Task restored</span>;
 
         default: {
-            const field = FIELD_LABELS[activity.field ?? ''] ?? activity.field ?? 'Field';
+            // Label and opacity come from the server so the timeline and the
+            // spreadsheet export never disagree about what a field is called.
+            const field = activity.field_label ?? 'Field';
 
-            if (OPAQUE_FIELDS.includes(activity.field ?? '')) {
+            if (activity.field_is_opaque) {
                 return <span>{field} updated</span>;
             }
 

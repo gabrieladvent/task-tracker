@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TechDevTaskController;
+use App\Http\Controllers\TrashController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -41,6 +42,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/generate-tasks', [TaskController::class, 'generateTasks'])
             ->name('periods.generate-tasks');
     });
+
+    Route::prefix('trash')->name('trash.')->group(function () {
+        Route::get('/', [TrashController::class, 'index'])->name('index');
+        Route::patch('/{type}/{id}/restore', [TrashController::class, 'restore'])->name('restore');
+        Route::delete('/{type}/{id}', [TrashController::class, 'forceDestroy'])->name('force-destroy');
+    })->whereIn('type', ['tasks', 'projects', 'periods']);
 
     Route::get('/activity', [ActivityController::class, 'index'])->name('activity.index');
     Route::get('/activity/export', [ActivityController::class, 'export'])->name('activity.export');

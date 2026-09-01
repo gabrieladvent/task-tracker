@@ -140,6 +140,19 @@ test('the export flattens the digest to one row per change', function () {
         ->and($rows->last()['detail'])->toBe('Todo → In Progress');
 });
 
+test('the export uses the same field wording as the timeline', function () {
+    $task = Task::factory()->forPeriod($this->period)->create(['story_points' => 3]);
+
+    $this->actingAs($this->user)->put(route('tasks.update', $task), ['story_points' => 8]);
+
+    $digest = app(App\Services\ActivityDigestService::class)->digest(Carbon::today(), Carbon::today());
+
+    $rows = (new App\Exports\ActivityDigestExport($digest, 'a', 'b'))->collection();
+
+    // "Story points", not the "Story Points" a generic humanizer would produce.
+    expect($rows->last()['detail'])->toBe('Story points: 3 → 8');
+});
+
 test('the export route downloads a spreadsheet for the current filters', function () {
     Maatwebsite\Excel\Facades\Excel::fake();
 
