@@ -78,6 +78,11 @@ jobs:
       - name: Install Playwright (required for Pest to load browser test files)
         run: npx playwright install --with-deps
 
+      # Feature tests render the Inertia root view, which resolves the Vite
+      # manifest. Without this the whole job 500s on every page render.
+      - name: Build assets
+        run: npm run build
+
       - name: Copy .env
         run: cp .env.example .env
 
