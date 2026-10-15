@@ -160,3 +160,21 @@ export interface TaskTimeline {
     summary: TaskTimelineSummary;
     activities: TaskActivity[];
 }
+
+/** One carry-over chain on the all-tasks page, shown as its newest copy. */
+export interface ChainTask extends CalendarTask {
+    root_task_id: string;
+    period_id: string;
+    period_name: string | null;
+    project_color: string | null;
+    first_task_date: string;
+    version_count: number;
+    carry_over_count: number;
+}
+
+export interface AllTasksFilters {
+    search: string;
+    status: string | null;
+    project_id: string | null;
+    per_page: number;
+}

@@ -32,6 +32,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Before the resource, or periods/{period} would swallow "all-tasks".
+    Route::get('periods/all-tasks', [TaskController::class, 'index'])->name('periods.all-tasks');
+
     Route::resource('periods', PeriodController::class);
 
     Route::get('period/last', [PeriodController::class, 'lastPeriod'])->name('periods.last');
